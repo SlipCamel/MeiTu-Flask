@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block head %}
+        <title>{% block title %}{% endblock %} - 美途</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        {% block styles %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
+        {% endblock styles %}
+    {% endblock head %}
+</head>
+<body>
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="img/desert_line_48px_1219375_easyicon.net.ico" alt="美途">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                    aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link active" href="/">
+                        首页 </a>
+
+                    <a class="nav-item nav-link " href="/explore">
+                        探索 </a>
+
+                    <a class="nav-item nav-link " href="/about">
+                        关于 </a>
+
+                    <form class="form-inline my-2 my-lg-0" action="/search">
+                        <input type="text" name="q" class="form-control mr-sm-1" placeholder="游记、照片、用户" required>
+                        <button class="btn btn-light my-2 my-sm-0" type="submit">
+                            <span class="oi oi-magnifying-glass"></span>
+                        </button>
+                    </form>
+                </div>
+                <div class="navbar-nav ml-auto">
+                    <a class="btn btn-outline-primary" href="/auth/login" style="margin-left: 200px;">登录</a>&nbsp;&nbsp;
+                    <a class="btn btn-primary" href="/auth/register">注册</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock navbar %}
+
+<main>
+    <div class="container">
+        {% block content %}{% endblock %}
+        {% block footer %}
+            <footer>
+                <p class="float-left">
+                    <small>&copy; 2019
+                        <a href="http://dashanshan.club" title="Written by GaiFan">Gai Fan</a> -
+                        <a href="#" title="Fork me on GitHub">GitHub</a> -
+                        <a href="#" title="A HelloFlask project">MeiTu-Flask</a>
+                    </small>
+                </p>
+                <p class="float-right">
+                    <small>Capture and share every wonderful moment.</small>
+                </p>
+            </footer>
+        {% endblock %}
+    </div>
+</main>
+</body>
+</html>
