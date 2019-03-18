@@ -14,6 +14,7 @@ flask-sqlalchemy = "*"
 flask-ckeditor = "*"
 flask-wtf = "*"
 flask-login = "*"
+bootstrap-flask = "*"
 
 [requires]
 python_version = "3.7"
