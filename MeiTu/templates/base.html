@@ -8,6 +8,7 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         {% block styles %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
             <link rel="stylesheet"
                   href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
         {% endblock styles %}
@@ -52,6 +53,7 @@
 {% endblock navbar %}
 
 <main>
+    {% block img %}{% endblock %}
     <div class="container">
         {% block content %}{% endblock %}
         {% block footer %}
@@ -61,7 +63,7 @@
                         <a href="http://dashanshan.club" title="Written by GaiFan" target="view_window">Gai Fan</a> -
                         <a href="https://github.com/SlipCamel/MeiTu-Flask" title="Fork this project on GitHub"
                            target="view_window">GitHub</a> -
-                        <a href="#" title="A HelloFlask project">MeiTu-Flask</a>
+                        <a href="#" title="A Flask project">MeiTu-Flask</a>
                     </small>
                 </p>
                 <p class="float-right">
@@ -78,6 +80,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 {% endblock %}
 </body>
 </html>
