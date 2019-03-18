@@ -8,6 +8,7 @@ from MeiTu.blueprint.auth import auth_bp
 from MeiTu.blueprint.main import main_bp
 from MeiTu.extensions import bootstrap
 
+
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_CONFIG', 'development')
