@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from MeiTu.settings import config
 
 
@@ -13,6 +13,6 @@ def create_app(config_name=None):
 
     @app.route('/')
     def hello():
-        return 'hello'
+        return render_template('base.html')
 
     return app

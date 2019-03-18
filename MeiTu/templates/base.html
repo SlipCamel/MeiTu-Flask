@@ -8,7 +8,8 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         {% block styles %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-            <link rel="stylesheet" href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
+            <link rel="stylesheet"
+                  href="{{ url_for('static', filename='open-iconic/font/css/open-iconic-bootstrap.css') }}">
         {% endblock styles %}
     {% endblock head %}
 </head>
@@ -17,7 +18,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="img/desert_line_48px_1219375_easyicon.net.ico" alt="美途">
+                <img src="{{ url_for('static', filename='favicon.ico') }}" alt="美途">
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
                     aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,8 +58,9 @@
             <footer>
                 <p class="float-left">
                     <small>&copy; 2019
-                        <a href="http://dashanshan.club" title="Written by GaiFan">Gai Fan</a> -
-                        <a href="#" title="Fork me on GitHub">GitHub</a> -
+                        <a href="http://dashanshan.club" title="Written by GaiFan" target="view_window">Gai Fan</a> -
+                        <a href="https://github.com/SlipCamel/MeiTu-Flask" title="Fork this project on GitHub"
+                           target="view_window">GitHub</a> -
                         <a href="#" title="A HelloFlask project">MeiTu-Flask</a>
                     </small>
                 </p>
@@ -69,5 +71,13 @@
         {% endblock %}
     </div>
 </main>
+
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.goup.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}
 </body>
 </html>
