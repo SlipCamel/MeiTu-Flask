@@ -15,6 +15,7 @@ flask-ckeditor = "*"
 flask-wtf = "*"
 flask-login = "*"
 bootstrap-flask = "*"
+flask-avatars = "*"
 
 [requires]
 python_version = "3.7"

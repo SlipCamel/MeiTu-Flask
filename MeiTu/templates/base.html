@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block head %}
-        <title>{% block title %}{% endblock %} - 美途</title>
+        <title>{% block title %}{% endblock %}美途</title>
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         {% block styles %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
@@ -37,15 +37,42 @@
                         关于 </a>
 
                     <form class="form-inline my-2 my-lg-0" action="/search">
-                        <input type="text" name="q" class="form-control mr-sm-1" placeholder="游记、照片、用户" required>
+                        <input type="text" name="q" class="form-control mr-sm-1" autocomplete="off"
+                               placeholder="游记、照片、用户" required>
                         <button class="btn btn-light my-2 my-sm-0" type="submit">
                             <span class="oi oi-magnifying-glass"></span>
                         </button>
                     </form>
                 </div>
                 <div class="navbar-nav ml-auto">
-                    <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}" style="margin-left: 200px;">登录</a>&nbsp;&nbsp;
-                    <a class="btn btn-primary" href="{{ url_for('auth.register') }}">注册</a>
+                    {% if current_user.is_authenticated %}
+                        <div class="dropdown nav-item">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <img class="avatar-xs"
+                                     src="{{ url_for('main.get_avatar', filename=current_user.avatar_s) }}">
+                                <span class="caret"></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                                <h6 class="dropdown-header">您好 {{ current_user.username }}！</h6>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('main.index', username=current_user.username) }}">
+                                    <span class="oi oi-person"></span> 我的首页
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <span class="oi oi-cog"></span> Settings
+                                </a>
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                                    <span class="oi oi-power-standby"></span> Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-outline-primary" href="{{ url_for('auth.login') }}"
+                           style="margin-left: 200px;">登录</a>&nbsp;&nbsp;
+                        <a class="btn btn-primary" href="{{ url_for('auth.register') }}">注册</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -55,6 +82,12 @@
 <main>
     {% block img %}{% endblock %}
     <div class="container">
+        {% for message in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{ message[0] }}">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                {{ message[1] }}
+            </div>
+        {% endfor %}
         {% block content %}{% endblock %}
         {% block footer %}
             <footer>

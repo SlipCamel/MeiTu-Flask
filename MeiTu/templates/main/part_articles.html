@@ -12,7 +12,8 @@
                 </li>
             </ul>
             <div class="tn-write">
-                <a class="btn-add" href="#" target="_blank" rel="nofollow">
+                <a class="btn-add" {% if current_user.is_authenticated %}href="#"
+                   {% else %}href="{{ url_for('auth.login') }}" {% endif %}>
                     <i></i>写游记
                 </a>
             </div>
@@ -68,7 +69,7 @@
                         </dl>
                         <div class="tn-extra">
                             <span class="tn-user">
-                                <a href="/u/919270.html" target="_blank" rel="nofollow"
+                                <a href="/" target="_blank" rel="nofollow"
                                    style="color: #000000;">
                                     <img src="{{ url_for('static', filename='img/test1.ico') }}">
                                         用户
