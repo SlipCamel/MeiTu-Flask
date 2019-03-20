@@ -201,3 +201,4 @@ fabric.properties
 .idea/workspace.xml
 
 /upload
+.env
