@@ -10,14 +10,28 @@ else:
     prefix = 'sqlite:////'
 
 
+class Operations:
+    CONFIRM = 'confirm'
+    RESET_PASSWORD = 'reset-password'
+    CHANGE_EMAIL = 'change-email'
+
+
 class BaseConfig(object):
-    SECRET_KEY = 'D6Z8oZ0sQ1rc'
+    SECRET_KEY = 'D6Z8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    MeiTu_UPLOAD_PATH = os.path.join(basedir, 'uploads')
+    MEITU_UPLOAD_PATH = os.path.join(basedir, 'uploads')
+    MEITU_MAIL_SUBJECT_PREFIX = '[美途]'
 
-    AVATARS_SAVE_PATH = os.path.join(MeiTu_UPLOAD_PATH, 'avatars')
+    AVATARS_SAVE_PATH = os.path.join(MEITU_UPLOAD_PATH, 'avatars')
     AVATARS_SIZE_TUPLE = (30, 100, 200)
+
+    MAIL_SERVER = os.getenv('MAIL_SERVER')
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = ('美途-管理员', MAIL_USERNAME)
 
 
 class DevelopmentConfig(BaseConfig):

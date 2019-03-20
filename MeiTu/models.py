@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     nick_name = db.Column(db.String(30))
     member_since = db.Column(db.DATETIME, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=True)
+    confirmed = db.Column(db.Boolean, default=False)
 
     # 头像相关
     avatar_s = db.Column(db.String(64))
@@ -31,7 +32,7 @@ class User(db.Model, UserMixin):
         self.password_hash = generate_password_hash(password)
 
     def validate_password(self, password):
-        return check_password_hash(password)
+        return check_password_hash(self.password_hash, password)
 
     @property
     def is_active(self):

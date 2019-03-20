@@ -5,7 +5,9 @@ from flask_login import current_user, login_user, logout_user, login_required
 from MeiTu.extensions import db
 from MeiTu.form.auth import LoginForm, RegisterForm
 from MeiTu.models import User
-from MeiTu.utils import redirect_back
+from MeiTu.utils import redirect_back, generate_token,validate_token
+from MeiTu.email_tool import send_confirm_email
+from MeiTu.settings import Operations
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -45,6 +47,8 @@ def register():
         try:
             db.session.add(user)
             db.session.commit()
+            token = generate_token(user, operation=Operations.CONFIRM)
+            send_confirm_email(user, token)
             flash('确认邮件已发出，请到邮箱确认', 'info')
         except Exception as e:
             db.session.rollback()
@@ -58,4 +62,30 @@ def register():
 def logout():
     logout_user()
     flash('成功登出', 'info')
+    return redirect(url_for('main.index'))
+
+
+@auth_bp.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+
+    if validate_token(user=current_user, token=token, operation=Operations.CONFIRM):
+        flash('邮箱已激活', 'success')
+        return redirect(url_for('main.index'))
+    else:
+        flash('邮箱激活失败', 'danger')
+        return redirect(url_for('auth.resend_confirm_email'))
+
+
+@auth_bp.route('/resend-confirm-email')
+@login_required
+def resend_confirm_email():
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+
+    token = generate_token(user=current_user, operation=Operations.CONFIRM)
+    send_confirm_email(user=current_user, token=token)
+    flash('新的验证邮件已发送，请查收', 'info')
     return redirect(url_for('main.index'))

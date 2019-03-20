@@ -16,6 +16,7 @@ flask-wtf = "*"
 flask-login = "*"
 bootstrap-flask = "*"
 flask-avatars = "*"
+flask-mail = "*"
 
 [requires]
 python_version = "3.7"
