@@ -1,0 +1,99 @@
+<div class="card bg-light mb-3 w-100 sidebar-nav">
+    <div class="card-body">
+        <div class="row">
+            <a href="#">
+                <img class="rounded avatar-s" style="margin-left: 15px; position: absolute"
+                     src="{{ url_for('main.get_avatar', filename=current_user.avatar_m) }}">
+            </a>
+            <div class="sidebar-nav-name">
+                <h6 class="card-title"><a
+                        href="#">{{ current_user.nick_name }}
+                </a></h6>
+                <p class="card-subtitle mb-2 text-muted">{{ current_user.username }}</p>
+            </div>
+        </div>
+        <a class="card-link" href="#">
+            <span class="oi oi-home"></span> 我的游记
+        </a><br>
+        <a class="card-link" href="#">
+            <span class="oi oi-star"></span> 我的收藏
+        </a>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header">热门标签</div>
+    <ul class="list-group list-group-flush">
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 10</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 9</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 8</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 7</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 6</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 5</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 4</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 3</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 2</span>
+        </li>
+
+        <li class="list-group-item  list-group-item-action d-flex justify-content-between align-items-center">
+            <a class="tag_list" href="#">
+                Default
+            </a>
+            <span class="badge badge-primary badge-pill"> 1</span>
+        </li>
+
+
+    </ul>
+</div>

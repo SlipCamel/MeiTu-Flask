@@ -26,7 +26,7 @@ def login():
                 return redirect_back()
             else:
                 flash('你的账号已被封禁', 'warning')
-                return redirect(url_for('main.index'))
+                return redirect(url_for('main.login'))
         flash('邮箱或密码错误', 'warning')
     return render_template('auth/login.html', form=form)
 

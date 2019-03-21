@@ -28,9 +28,11 @@ def create_app(config_name=None):
 def register_blueprint(app):
     from MeiTu.blueprint.auth import auth_bp
     from MeiTu.blueprint.main import main_bp
+    from MeiTu.blueprint.user import user_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(user_bp, url_prefix='/user')
 
 
 def register_extensions(app):
