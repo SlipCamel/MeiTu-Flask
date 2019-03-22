@@ -88,4 +88,4 @@ def resend_confirm_email():
     token = generate_token(user=current_user, operation=Operations.CONFIRM)
     send_confirm_email(user=current_user, token=token)
     flash('新的验证邮件已发送，请查收', 'info')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('user.index', username=current_user.username))

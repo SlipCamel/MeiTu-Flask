@@ -26,6 +26,8 @@ class BaseConfig(object):
     AVATARS_SAVE_PATH = os.path.join(MEITU_UPLOAD_PATH, 'avatars')
     AVATARS_SIZE_TUPLE = (30, 100, 200)
 
+    MAX_CONTENT_LENGTH = 3 * 1024 * 1024
+
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = 465
     MAIL_USE_SSL = True

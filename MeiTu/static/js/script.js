@@ -18,3 +18,24 @@ $(document).ready(function () {
         titleAsText: true
     });
 });
+
+
+$('#getCode').unbind('click').click(function (event) {
+    event.preventDefault();
+    time(this);
+});
+var wait = 60;
+function time(o) {
+    if (wait == 0) {
+        o.removeAttribute("disabled");
+        o.innerHTML = "获取动态码";
+        wait = 60;
+    } else {
+        o.setAttribute("disabled", true);
+        o.innerHTML = "重新发送(" + wait + ")";
+        wait--;
+        setTimeout(function () {
+            time(o)
+        }, 1000)
+    }
+}

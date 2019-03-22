@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from flask_wtf.file import FileRequired, FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, HiddenField, \
+    IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Optional, ValidationError
 from MeiTu.models import User
 
@@ -15,5 +17,30 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('完成修改')
 
     def validate_username(self, field):
-        if field.data != User.query.filter_by(username=field.data).first():
+        if field.data == User.query.filter_by(username=field.data).first().username:
             raise ValidationError('用户名已存在')
+
+
+class UploadAvatarForm(FlaskForm):
+    image = FileField('上传头像', validators=[
+        FileRequired(),
+        FileAllowed(['jpg', 'png'], '仅支持[ jpg, png]格式')
+    ])
+    submit = SubmitField('确认')
+
+
+class CropAvatarForm(FlaskForm):
+    x = HiddenField()
+    y = HiddenField()
+    w = HiddenField()
+    h = HiddenField()
+    submit = SubmitField('完成修改')
+
+
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField('旧密码', validators=[DataRequired()])
+    password = PasswordField('新密码', validators=[
+        DataRequired(), Length(8, 128), EqualTo('password2')])
+    password2 = PasswordField('再次输入', validators=[DataRequired()])
+    verify_code = IntegerField('验证码', validators=[DataRequired()])
+    submit = SubmitField('提交')
