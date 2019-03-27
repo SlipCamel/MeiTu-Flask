@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
+
+from MeiTu.email_tool import send_confirm_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm
 from MeiTu.extensions import db, avatars
 from MeiTu.utils import redirect_back
@@ -102,5 +104,5 @@ def change_password():
 @user_bp.route('/send_verify')
 @login_required
 def send_verify():
-    flash('aa', 'success')
-    return True
+    send_confirm_email(user=current_user, token='success')
+    return jsonify({'ok': True})

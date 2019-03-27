@@ -23,8 +23,10 @@ $(document).ready(function () {
 $('#getCode').unbind('click').click(function (event) {
     event.preventDefault();
     time(this);
+    sendEmail()
 });
 var wait = 60;
+
 function time(o) {
     if (wait == 0) {
         o.removeAttribute("disabled");
@@ -38,4 +40,18 @@ function time(o) {
             time(o)
         }, 1000)
     }
+}
+
+function sendEmail() {
+    $.ajax({
+        type: 'GET',
+        url: '/user/send_verify',
+        dataType: 'json',
+        success: function () {
+            alert('邮件发送成功')
+        },
+        error:function () {
+            alert('邮件发送失败')
+        }
+    })
 }
