@@ -3,9 +3,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_user, logout_user, login_required
 
 from MeiTu.extensions import db
-from MeiTu.form.auth import LoginForm, RegisterForm
+from MeiTu.form.auth import LoginForm, RegisterForm, ForgetPasswordForm
 from MeiTu.models import User
-from MeiTu.utils import redirect_back, generate_token,validate_token
+from MeiTu.utils import redirect_back, generate_token, validate_token
 from MeiTu.email_tool import send_confirm_email
 from MeiTu.settings import Operations
 
@@ -89,3 +89,11 @@ def resend_confirm_email():
     send_confirm_email(user=current_user, token=token)
     flash('新的验证邮件已发送，请查收', 'info')
     return redirect(url_for('user.index', username=current_user.username))
+
+
+@auth_bp.route('/forget_password')
+def forget_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = ForgetPasswordForm()
+    return render_template('auth/forget_password.html', form=form)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp
 
 
@@ -22,3 +22,12 @@ class RegisterForm(FlaskForm):
                         validators=[DataRequired(), Length(1, 254), Email()])
     nick_name = StringField('昵称', render_kw={'placeholder': '请输入昵称'}, validators=[DataRequired(), Length(1, 12)])
     submit = SubmitField('立即注册')
+
+
+class ForgetPasswordForm(FlaskForm):
+    email = StringField('注册邮箱', validators=[DataRequired(), Length(1, 254), Email()])
+    password = PasswordField('新密码', render_kw={'placeholder': '请输入密码'},
+                             validators=[DataRequired(), Length(1, 128), EqualTo('password2', message='两次密码不一致')])
+    password2 = PasswordField('确认密码', render_kw={'placeholder': '请再次输入密码'}, validators=[DataRequired()])
+    verify_code = IntegerField('验证码', render_kw={'autocomplete': 'off'}, validators=[DataRequired()])
+    submit = SubmitField('提交')

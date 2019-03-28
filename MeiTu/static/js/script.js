@@ -23,7 +23,12 @@ $(document).ready(function () {
 $('#getCode').unbind('click').click(function (event) {
     event.preventDefault();
     time(this);
-    sendEmail()
+    SendEmailCode()
+});
+
+$('#get_pwd').unbind('click').click(function (event) {
+    event.preventDefault();
+    time(this);
 });
 var wait = 60;
 
@@ -42,10 +47,28 @@ function time(o) {
     }
 }
 
-function sendEmail() {
+function SendEmailCode() {
     $.ajax({
         type: 'GET',
         url: '/user/send_verify',
+        dataType: 'json',
+        success: function (data) {
+            if (data.data == 60) {
+                alert('发送频率过快，请稍后重试')
+            } else {
+                alert(data.data)
+            }
+        },
+        error: function () {
+            alert('邮件发送失败')
+        }
+    })
+}
+
+function SendPasswordCode() {
+    $.ajax({
+        type: 'GET',
+        url: '/auth/send_verify',
         dataType: 'json',
         success: function (data) {
             if (data.data == 60) {

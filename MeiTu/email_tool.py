@@ -25,3 +25,7 @@ def send_confirm_email(user, token, to=None):
 
 def send_token_email(user, token, to=None):
     send_mail(subject='动态令牌', to=to or user.email, template='emails/token', user=user, token=token)
+
+
+def send_change_email_email(user, token, to=None):
+    send_mail(subject='更改邮箱', to=to or user.email, template='emails/change_email', user=user, token=token)

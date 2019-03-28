@@ -2,6 +2,8 @@
 from flask import current_app, request, url_for, redirect, flash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
+
+from MeiTu import User
 from MeiTu.settings import Operations
 from MeiTu.extensions import db
 
@@ -54,6 +56,13 @@ def validate_token(user, token, operation):
 
     if operation == Operations.CONFIRM:
         user.confirmed = True
-        db.session.commit()
+    elif operation == Operations.CHANGE_EMAIL:
+        new_email = data.get('new_email')
+        if not new_email:
+            return False
+        elif User.query.filter_by(email=new_email).first():
+            return False
+        user.email = new_email
 
+    db.session.commit()
     return True

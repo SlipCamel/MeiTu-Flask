@@ -1,0 +1,5 @@
+<p>你好 {{ user.username }},</p>
+<p>请点击下方的链接以完成您的邮箱更改:<br>
+    <a href="{{ url_for('user.change_email_confirm', token=token, _external=True) }}">{{ url_for('user.change_email_confirm', token=token, _external=True) }}</a>
+</p>
+<small>(请不要回复此邮件，您的回复将收不到任何答复.)</small>

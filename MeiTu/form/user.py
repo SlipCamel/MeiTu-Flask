@@ -17,7 +17,7 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('完成修改')
 
     def validate_username(self, field):
-        if field.data == User.query.filter_by(username=field.data).first().username:
+        if User.query.filter_by(username=field.data).first():
             raise ValidationError('用户名已存在')
 
 
@@ -44,3 +44,12 @@ class ChangePasswordForm(FlaskForm):
     password2 = PasswordField('再次输入', validators=[DataRequired()])
     verify_code = IntegerField('验证码', render_kw={'autocomplete': 'off'}, validators=[DataRequired()])
     submit = SubmitField('提交')
+
+
+class ChangeEmailForm(FlaskForm):
+    email = StringField('新的邮箱', validators=[DataRequired(), Length(1, 254), Email()])
+    submit = SubmitField('更改')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data.lower()).first():
+            raise ValidationError('邮箱已经存在！')

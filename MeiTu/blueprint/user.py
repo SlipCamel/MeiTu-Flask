@@ -3,10 +3,11 @@ import random
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user, logout_user
 
-from MeiTu.email_tool import send_token_email
-from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm
+from MeiTu.email_tool import send_token_email, send_change_email_email
+from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm
 from MeiTu.extensions import db, avatars, cache
-from MeiTu.utils import redirect_back
+from MeiTu.settings import Operations
+from MeiTu.utils import redirect_back, generate_token, validate_token
 from MeiTu.decorators import confirm_mail
 
 user_bp = Blueprint('user', __name__)
@@ -108,7 +109,7 @@ def change_password():
                 logout_user()
                 return redirect(url_for('auth.login'))
             else:
-                flash('验证码错误', 'warning')
+                flash('验证码错误或失效', 'warning')
         else:
             flash('密码错误', 'warning')
     return render_template('user/settings/change_password.html', form=form)
@@ -118,10 +119,33 @@ def change_password():
 @login_required
 def send_verify():
     token = random.randint(100000, 999999)
-    if not cache.get(current_user.username+'exist'):
+    if not cache.get(current_user.username + 'exist'):
         send_token_email(user=current_user, token=token)
         cache.set(current_user.username, token, timeout=600)
-        cache.set(current_user.username+'exist', 'true', timeout=45)
+        cache.set(current_user.username + 'exist', 'true', timeout=45)
         return jsonify({'data': '邮件发送成功'})
     else:
         return jsonify({'data': 60})
+
+
+@user_bp.route('/settings/change-email', methods=['POST', 'GET'])
+@login_required
+def change_email():
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        token = generate_token(user=current_user, operation=Operations.CHANGE_EMAIL, new_email=form.email.data.lower())
+        send_change_email_email(to=form.email.data, user=current_user, token=token)
+        flash('重置链接已发送，请登录新邮箱查看', 'info')
+        return redirect(url_for('user.index', username=current_user.username))
+    return render_template('user/settings/change_email.html', form=form)
+
+
+@user_bp.route('/email/confirm/<token>')
+@login_required
+def change_email_confirm(token):
+    if validate_token(current_user, token, operation=Operations.CHANGE_EMAIL):
+        flash('邮箱更改成功', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    else:
+        flash('邮箱更改失败，链接过期或失效。', 'warning')
+        return redirect(url_for('user.change_email', username=current_user.username))
