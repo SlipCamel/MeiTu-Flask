@@ -17,6 +17,8 @@ flask-login = "*"
 bootstrap-flask = "*"
 flask-avatars = "*"
 flask-mail = "*"
+flask-caching = "*"
+redis = "*"
 
 [requires]
 python_version = "3.7"

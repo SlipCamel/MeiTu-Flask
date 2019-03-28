@@ -42,5 +42,5 @@ class ChangePasswordForm(FlaskForm):
     password = PasswordField('新密码', validators=[
         DataRequired(), Length(8, 128), EqualTo('password2')])
     password2 = PasswordField('再次输入', validators=[DataRequired()])
-    verify_code = IntegerField('验证码', validators=[DataRequired()])
+    verify_code = IntegerField('验证码', render_kw={'autocomplete': 'off'}, validators=[DataRequired()])
     submit = SubmitField('提交')

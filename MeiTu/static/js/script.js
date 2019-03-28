@@ -30,7 +30,7 @@ var wait = 60;
 function time(o) {
     if (wait == 0) {
         o.removeAttribute("disabled");
-        o.innerHTML = "获取动态码";
+        o.innerHTML = "发送验证码";
         wait = 60;
     } else {
         o.setAttribute("disabled", true);
@@ -47,10 +47,14 @@ function sendEmail() {
         type: 'GET',
         url: '/user/send_verify',
         dataType: 'json',
-        success: function () {
-            alert('邮件发送成功')
+        success: function (data) {
+            if (data.data == 60) {
+                alert('发送频率过快，请稍后重试')
+            } else {
+                alert(data.data)
+            }
         },
-        error:function () {
+        error: function () {
             alert('邮件发送失败')
         }
     })

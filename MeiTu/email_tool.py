@@ -21,3 +21,7 @@ def send_mail(subject, to, template, **kwargs):
 
 def send_confirm_email(user, token, to=None):
     send_mail(subject='激活邮件', to=to or user.email, template='emails/confirm', user=user, token=token)
+
+
+def send_token_email(user, token, to=None):
+    send_mail(subject='动态令牌', to=to or user.email, template='emails/token', user=user, token=token)

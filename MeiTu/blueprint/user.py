@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import random
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 
-from MeiTu.email_tool import send_confirm_email
+from MeiTu.email_tool import send_token_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm
-from MeiTu.extensions import db, avatars
+from MeiTu.extensions import db, avatars, cache
 from MeiTu.utils import redirect_back
 from MeiTu.decorators import confirm_mail
 
@@ -98,11 +99,29 @@ def crop_avatar():
 @login_required
 def change_password():
     form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.validate_password(form.old_password.data):
+            if cache.get(current_user.username):
+                current_user.set_password(form.password.data)
+                db.session.commit()
+                flash('修改成功,请重新登录', 'success')
+                logout_user()
+                return redirect(url_for('auth.login'))
+            else:
+                flash('验证码错误', 'warning')
+        else:
+            flash('密码错误', 'warning')
     return render_template('user/settings/change_password.html', form=form)
 
 
 @user_bp.route('/send_verify')
 @login_required
 def send_verify():
-    send_confirm_email(user=current_user, token='success')
-    return jsonify({'ok': True})
+    token = random.randint(100000, 999999)
+    if not cache.get(current_user.username+'exist'):
+        send_token_email(user=current_user, token=token)
+        cache.set(current_user.username, token, timeout=600)
+        cache.set(current_user.username+'exist', 'true', timeout=45)
+        return jsonify({'data': '邮件发送成功'})
+    else:
+        return jsonify({'data': 60})

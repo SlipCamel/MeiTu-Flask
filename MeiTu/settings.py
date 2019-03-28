@@ -20,6 +20,11 @@ class BaseConfig(object):
     SECRET_KEY = 'D6Z8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    CACHE_TYPE = 'redis'
+    CACHE_REDIS_HOST = '127.0.0.1'
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_DB = 1
+
     MEITU_UPLOAD_PATH = os.path.join(basedir, 'uploads')
     MEITU_MAIL_SUBJECT_PREFIX = '[美途]'
 
