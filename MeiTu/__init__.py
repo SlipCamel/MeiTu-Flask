@@ -21,6 +21,7 @@ def create_app(config_name=None):
     register_blueprint(app)
     register_extensions(app)
     register_commands(app)
+    register_errors(app)
 
     return app
 
@@ -42,6 +43,12 @@ def register_extensions(app):
     avatars.init_app(app)
     mail.init_app(app)
     cache.init_app(app)
+
+
+def register_errors(app):
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template('errors/403.html', flag=True), 403
 
 
 def register_commands(app):

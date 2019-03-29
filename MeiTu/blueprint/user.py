@@ -102,7 +102,7 @@ def change_password():
     form = ChangePasswordForm()
     if form.validate_on_submit():
         if current_user.validate_password(form.old_password.data):
-            if cache.get(current_user.username):
+            if cache.get(current_user.username) == form.verify_code.data:
                 current_user.set_password(form.password.data)
                 db.session.commit()
                 flash('修改成功,请重新登录', 'success')
@@ -118,8 +118,8 @@ def change_password():
 @user_bp.route('/send_verify')
 @login_required
 def send_verify():
-    token = random.randint(100000, 999999)
     if not cache.get(current_user.username + 'exist'):
+        token = random.randint(100000, 999999)
         send_token_email(user=current_user, token=token)
         cache.set(current_user.username, token, timeout=600)
         cache.set(current_user.username + 'exist', 'true', timeout=45)

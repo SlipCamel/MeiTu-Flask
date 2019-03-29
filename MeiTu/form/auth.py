@@ -25,7 +25,12 @@ class RegisterForm(FlaskForm):
 
 
 class ForgetPasswordForm(FlaskForm):
-    email = StringField('注册邮箱', validators=[DataRequired(), Length(1, 254), Email()])
+    email = StringField('邮箱', render_kw={'placeholder': '请输入邮箱地址'},
+                        validators=[DataRequired(), Length(1, 254), Email()])
+    submit = SubmitField('提交')
+
+
+class ForgetPasswordResetForm(FlaskForm):
     password = PasswordField('新密码', render_kw={'placeholder': '请输入密码'},
                              validators=[DataRequired(), Length(1, 128), EqualTo('password2', message='两次密码不一致')])
     password2 = PasswordField('确认密码', render_kw={'placeholder': '请再次输入密码'}, validators=[DataRequired()])

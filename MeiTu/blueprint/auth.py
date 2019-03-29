@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, redirect, url_for, flash
+import random
+
+from flask import Blueprint, render_template, redirect, url_for, flash, abort, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
 
-from MeiTu.extensions import db
-from MeiTu.form.auth import LoginForm, RegisterForm, ForgetPasswordForm
+from MeiTu.extensions import db, cache
+from MeiTu.form.auth import LoginForm, RegisterForm, ForgetPasswordForm, ForgetPasswordResetForm
 from MeiTu.models import User
 from MeiTu.utils import redirect_back, generate_token, validate_token
-from MeiTu.email_tool import send_confirm_email
+from MeiTu.email_tool import send_confirm_email, send_token_email
 from MeiTu.settings import Operations
 
 auth_bp = Blueprint('auth', __name__)
@@ -91,9 +93,55 @@ def resend_confirm_email():
     return redirect(url_for('user.index', username=current_user.username))
 
 
-@auth_bp.route('/forget_password')
-def forget_password():
+@auth_bp.route('/forget_password', methods=['POST', 'GET'])
+def check_mail():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
+
     form = ForgetPasswordForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(email=form.email.data).first():
+            return redirect(url_for('auth.reset_password', email=form.email.data))
+        else:
+            flash('邮箱不存在', 'warning')
     return render_template('auth/forget_password.html', form=form)
+
+
+@auth_bp.route('/reset_password/<email>', methods=['POST', 'GET'])
+def reset_password(email):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        form = ForgetPasswordResetForm()
+        if form.validate_on_submit():
+            if cache.get(user.username) == form.verify_code.data:
+                user.set_password(form.password.data)
+                db.session.commit()
+                flash('密码找回成功!', 'success')
+                return redirect(url_for('auth.login'))
+            else:
+                flash('验证码错误或失效', 'warning')
+        return render_template('auth/forget_reset.html', form=form, email=email)
+    else:
+        abort(403)
+
+
+@auth_bp.route('/send_verify_pwd/<email>')
+def send_verify_pwd(email):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        if not cache.get(user.username + 'find'):
+            token = random.randint(100000, 999999)
+            send_token_email(user=user, token=token)
+            cache.set(user.username, token, timeout=600)
+            cache.set(user.username + 'find', 'true', timeout=45)
+            return jsonify({'data': '邮件发送成功'})
+        else:
+            return jsonify({'data': 60})
+    else:
+        abort(403)

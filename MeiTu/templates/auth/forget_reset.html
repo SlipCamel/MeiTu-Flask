@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+
+{% block title %}找回密码 - {% endblock %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-sm-8">
+                {% include 'main/carousel.html' %}
+            </div>
+            <div class="col-sm-4 ">
+                <div class="card mb-3 w-100 bg-light">
+                    <h3 class="card-header">找回密码
+                        <button id="get_pwd" type="button" class="btn btn-primary float-right">发送验证码</button>
+                    </h3>
+                    <div class="card-body">
+                        {{ render_form(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript">
+        $('#get_pwd').unbind('click').click(function (event) {
+            event.preventDefault();
+            time(this);
+            SendPasswordCode()
+        });
+
+        function SendPasswordCode() {
+            $.ajax({
+                type: 'GET',
+                url: '{{ url_for('auth.send_verify_pwd',email=email) }}',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.data == 60) {
+                        alert('发送频率过快，请稍后重试')
+                    } else {
+                        alert(data.data)
+                    }
+                },
+                error: function () {
+                    alert('邮件发送失败')
+                }
+            })
+        }
+    </script>
+{% endblock %}

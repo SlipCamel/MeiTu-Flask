@@ -14,7 +14,7 @@
                         {{ render_form(form) }}
                         <hr>
                         <p class="small">还没有账号？<a href="{{ url_for('auth.register') }}">马上注册！</a></p>
-                        <p class="small"><a href="{{ url_for('auth.forget_password') }}">忘记密码</a></p>
+                        <p class="small"><a href="{{ url_for('auth.check_mail') }}">忘记密码</a></p>
                         <hr>
                         <p class="small">用合作网站账户直接登录</p>
                         <img src="{{ url_for('static', filename='img/test1.ico') }}">
