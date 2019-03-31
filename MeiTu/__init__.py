@@ -5,7 +5,7 @@ import click
 from flask import Flask, render_template
 
 from MeiTu.settings import config
-from MeiTu.extensions import bootstrap, db, login_manage, avatars, mail, cache
+from MeiTu.extensions import bootstrap, db, login_manage, avatars, mail, cache, moment
 from MeiTu.models import User
 
 
@@ -43,6 +43,7 @@ def register_extensions(app):
     avatars.init_app(app)
     mail.init_app(app)
     cache.init_app(app)
+    moment.init_app(app)
 
 
 def register_errors(app):

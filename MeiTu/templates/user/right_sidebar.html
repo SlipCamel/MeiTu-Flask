@@ -1,14 +1,16 @@
 <div class="card bg-light mb-3 w-100 sidebar-nav">
     <div class="card-body">
         <div class="row">
-            <a href="#">
+            <a href="{{ url_for('user.my_index', username=current_user.username) }}">
                 <img class="rounded avatar-s" style="margin-left: 15px; position: absolute"
                      src="{{ url_for('main.get_avatar', filename=current_user.avatar_m) }}">
             </a>
             <div class="sidebar-nav-name">
-                <h6 class="card-title"><a
-                        href="#">{{ current_user.nick_name }}
-                </a></h6>
+                <h6 class="card-title">
+                    <a href="#">
+                        {{ current_user.nick_name }}
+                    </a>
+                </h6>
                 <p class="card-subtitle mb-2 text-muted">{{ current_user.username }}</p>
             </div>
         </div>

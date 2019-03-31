@@ -3,6 +3,7 @@ import random
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user, logout_user
 
+from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm
 from MeiTu.extensions import db, avatars, cache
@@ -19,21 +20,26 @@ def index(username):
     return render_template('user/index.html')
 
 
+@user_bp.route('/my_index/<username>')
+@login_required
+def my_index(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    return render_template('user/my_index.html', user=user)
+
+
 @user_bp.route('settings/profile', methods=['POST', 'GET'])
 @login_required
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
-        current_user.username = form.username.data
         current_user.nick_name = form.nick_name.data
         current_user.location = form.location.data
         current_user.biography = form.biography.data
         db.session.commit()
         flash('个人信息修改成功！', 'success')
-        # 应返回个人信息页，目前未完成顾返回个人首页
-        return redirect(url_for('user.index', username=current_user.username))
+        return redirect(url_for('user.my_index', username=current_user.username))
 
-    form.username.data = current_user.username
     form.nick_name.data = current_user.nick_name
     form.biography.data = current_user.biography
     form.location.data = current_user.location

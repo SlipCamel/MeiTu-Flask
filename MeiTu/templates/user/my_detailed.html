@@ -1,0 +1,39 @@
+{% from 'bootstrap/nav.html' import render_nav_item %}
+
+
+<div class="row">
+    <div class="col-md-3">
+        <a href="{% if current_user == user %}{{ url_for('user.change_avatar') }}{% else %}#{% endif %}"
+           title="更改头像">
+            <img class="img-fluid rounded" src="{{ url_for('main.get_avatar', filename=user.avatar_l) }}">
+        </a>
+    </div>
+    <div class="col-md-9">
+        <h1>{{ user.nick_name }}
+            <small class="text-muted">{{ user.username }}</small>
+        </h1>
+        {% if user.biography %}<p>{{ user.biography }}</p>{% endif %}
+        <p>
+            {% if user.location %}
+                <span class="oi oi-map-marker"></span>
+                <a href="https://map.baidu.com/?q={{ user.location }}"
+                   target="_blank">{{ user.location|truncate(30) }}</a>&nbsp;&nbsp;
+            {% endif %}
+            <span class="oi oi-calendar"></span>
+            加入时间: {{ moment(user.member_since).format('LL') }}
+        </p>
+        <div>
+            <div class="float-right">
+                {% if current_user.is_authenticated and user == current_user %}
+                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user.edit_profile') }}">Edit profile</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="user-nav">
+    <ul class="nav nav-tabs">
+        {{ render_nav_item('user.my_index','游记',username=user.username) }}
+    </ul>
+</div>
+

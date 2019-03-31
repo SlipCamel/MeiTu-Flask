@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_avatars import Avatars
 from flask_mail import Mail
 from flask_caching import Cache
+from flask_moment import Moment
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -12,6 +13,7 @@ login_manage = LoginManager()
 avatars = Avatars()
 mail = Mail()
 cache = Cache()
+moment = Moment()
 
 
 @login_manage.user_loader
