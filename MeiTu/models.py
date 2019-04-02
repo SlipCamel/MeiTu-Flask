@@ -20,6 +20,8 @@ class User(db.Model, UserMixin):
     biography = db.Column(db.String(120))
     location = db.Column(db.String(50))
 
+    travels = db.relationship('Travels', back_populates='author', cascade='all')
+
     # 头像相关
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
@@ -48,3 +50,22 @@ class User(db.Model, UserMixin):
         self.avatar_m = filenames[1]
         self.avatar_l = filenames[2]
         db.session.commit()
+
+
+class Travels(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String(30), unique=True)
+    title = db.Column(db.String(60))
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    author = db.relationship('User', back_populates='travels')
+    travel_head = db.relationship('TravelHead', uselist=False, cascade='all, delete-orphan')
+
+
+class TravelHead(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(60))
+    travels_id = db.Column(db.Integer, db.ForeignKey('travels.id'))
+    travels = db.relationship('Travels')

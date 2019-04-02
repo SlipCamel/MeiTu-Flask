@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}写游记 - {% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dropzone.min.css') }}" type="text/css">
+    {{ dropzone.style('margin: 20px 0; border: 2px dashed #0087F7; min-height: 400px;') }}
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>写游记</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {{ dropzone.create(action=url_for('user.set_head', uid=uid)) }}
+            <a class="btn btn-light float-right" href="{{ url_for('user.index', username=current_user.username) }}">
+                Done
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+    {{ dropzone.config() }}
+    <script type="text/javascript">
+        //禁用浏览器后退功能
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+        });
+    </script>
+
+{% endblock %}

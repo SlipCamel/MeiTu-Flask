@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+import uuid
+
 from flask import current_app, request, url_for, redirect, flash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
@@ -66,3 +69,9 @@ def validate_token(user, token, operation):
 
     db.session.commit()
     return True
+
+
+def rename_image(old_filename):
+    ext = os.path.splitext(old_filename)[1]
+    new_filename = uuid.uuid4().hex + ext
+    return new_filename

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% block title %}写游记 - {% endblock %}
+
+{% block styles %}
+    {{ super() }}
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='css/dropzone.min.css') }}" type="text/css">#}
+{#    {{ dropzone.style('margin: 20px 0; border: 2px dashed #0087F7; min-height: 400px;') }}#}
+    {{ ckeditor.load(custom_url=url_for('static', filename='ckeditor/ckeditor.js')) }}
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>写游记</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+{#            {{ dropzone.create(action='user.write_travels') }}#}
+            {{ render_form(form) }}
+            {{ ckeditor.config(name='content') }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/dropzone.min.js') }}"></script>
+    {{ dropzone.config() }}
+{% endblock %}

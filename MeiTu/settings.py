@@ -2,6 +2,8 @@
 import os
 import sys
 
+from flask_login import current_user
+
 basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 WIN = sys.platform.startswith('win')
 if WIN:
@@ -19,6 +21,7 @@ class Operations:
 class BaseConfig(object):
     SECRET_KEY = 'D6Z8'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # SQLALCHEMY_ECHO = True
 
     CACHE_TYPE = 'redis'
     CACHE_REDIS_HOST = '127.0.0.1'
@@ -31,7 +34,7 @@ class BaseConfig(object):
     AVATARS_SAVE_PATH = os.path.join(MEITU_UPLOAD_PATH, 'avatars')
     AVATARS_SIZE_TUPLE = (30, 100, 200)
 
-    MAX_CONTENT_LENGTH = 3 * 1024 * 1024
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
 
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = 465
@@ -39,6 +42,18 @@ class BaseConfig(object):
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = ('美途-管理员', MAIL_USERNAME)
+
+    DROPZONE_ALLOWED_FILE_TYPE = 'image'
+    DROPZONE_MAX_FILE_SIZE = 5
+    DROPZONE_MAX_FILES = 1
+    DROPZONE_ENABLE_CSRF = True
+    DROPZONE_DEFAULT_MESSAGE = '请上传一张游记头图，图片大小小于5MB。'
+
+    CKEDITOR_ENABLE_CSRF = True
+    CKEDITOR_SERVE_LOCAL = True
+    # CKEDITOR_EXTRA_PLUGINS = ['font']
+    # CKEDITOR_FILE_UPLOADER = '/admin/upload'
+    FILE_UPLOAD = os.path.join(MEITU_UPLOAD_PATH, 'pic')
 
 
 class DevelopmentConfig(BaseConfig):

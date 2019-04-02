@@ -12,7 +12,7 @@
                 </li>
             </ul>
             <div class="tn-write">
-                <a class="btn-add" {% if current_user.is_authenticated %}href="#"
+                <a class="btn-add" {% if current_user.is_authenticated %}href="{{ url_for('user.write_travels') }}"
                    {% else %}href="{{ url_for('auth.login') }}" {% endif %}>
                     <i></i>写游记
                 </a>

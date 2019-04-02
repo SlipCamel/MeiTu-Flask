@@ -6,6 +6,9 @@ from flask_avatars import Avatars
 from flask_mail import Mail
 from flask_caching import Cache
 from flask_moment import Moment
+from flask_wtf import CSRFProtect
+from flask_dropzone import Dropzone
+from flask_ckeditor import CKEditor
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -14,6 +17,9 @@ avatars = Avatars()
 mail = Mail()
 cache = Cache()
 moment = Moment()
+csrf = CSRFProtect()
+drop_zone = Dropzone()
+ckeditor = CKEditor()
 
 
 @login_manage.user_loader

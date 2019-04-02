@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from flask_ckeditor import CKEditorField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, HiddenField, \
@@ -46,3 +47,9 @@ class ChangeEmailForm(FlaskForm):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data.lower()).first():
             raise ValidationError('邮箱已经存在！')
+
+
+class WriteTravelsForm(FlaskForm):
+    title = StringField('标题', validators=[DataRequired(), Length(1, 60)])
+    body = CKEditorField('内容', validators=[DataRequired()])
+    submit = SubmitField('下一步')
