@@ -200,6 +200,9 @@ fabric.properties
 .idea/workspace.xml
 .idea/workspace.xml
 
-upload/*
+uploads/*
 .env
 .idea
+*.png
+*.jpg
+*.gif
