@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import PIL
 import os
 import uuid
 
+from PIL import Image
 from flask import current_app, request, url_for, redirect, flash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature, SignatureExpired
@@ -74,4 +76,17 @@ def validate_token(user, token, operation):
 def rename_image(old_filename):
     ext = os.path.splitext(old_filename)[1]
     new_filename = uuid.uuid4().hex + ext
+    return new_filename
+
+
+def resize_rename_img(image, filename, path, base_width=730):
+    filename, ext = os.path.splitext(filename)
+    new_filename = uuid.uuid4().hex + ext
+    img = Image.open(image)
+    if img.size[0] <= base_width:
+        return new_filename
+    w_percent = (base_width / float(img.size[0]))
+    h_size = int((float(img.size[1]) * float(w_percent)))
+    img = img.resize((base_width, h_size), PIL.Image.ANTIALIAS)
+    img.save(os.path.join(path, new_filename), optimize=True, quality=85)
     return new_filename

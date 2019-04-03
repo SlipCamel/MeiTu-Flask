@@ -52,4 +52,4 @@ class ChangeEmailForm(FlaskForm):
 class WriteTravelsForm(FlaskForm):
     title = StringField('标题', validators=[DataRequired(), Length(1, 60)])
     body = CKEditorField('内容', validators=[DataRequired()])
-    submit = SubmitField('下一步')
+    submit = SubmitField('完成')

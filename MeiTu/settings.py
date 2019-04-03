@@ -30,6 +30,7 @@ class BaseConfig(object):
 
     MEITU_UPLOAD_PATH = os.path.join(basedir, 'uploads')
     MEITU_MAIL_SUBJECT_PREFIX = '[美途]'
+    MEITU_TRAVELS_PER_PAGE = 10
 
     AVATARS_SAVE_PATH = os.path.join(MEITU_UPLOAD_PATH, 'avatars')
     AVATARS_SIZE_TUPLE = (30, 100, 200)
@@ -48,11 +49,12 @@ class BaseConfig(object):
     DROPZONE_MAX_FILES = 1
     DROPZONE_ENABLE_CSRF = True
     DROPZONE_DEFAULT_MESSAGE = '请上传一张游记头图，图片大小小于5MB。'
+    DROPZONE_FILE_UPLOAD = os.path.join(MEITU_UPLOAD_PATH, 'head')
 
     CKEDITOR_ENABLE_CSRF = True
     CKEDITOR_SERVE_LOCAL = True
-    # CKEDITOR_EXTRA_PLUGINS = ['font']
-    # CKEDITOR_FILE_UPLOADER = '/admin/upload'
+    CKEDITOR_FILE_UPLOADER = '/user/upload'
+    CKEDITOR_FILE_BROWSER = '/user/show_upload'
     FILE_UPLOAD = os.path.join(MEITU_UPLOAD_PATH, 'pic')
 
 

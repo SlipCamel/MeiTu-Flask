@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ user.nick_name }}{% endblock %}
+{% block title %}{{ user.nick_name }} - {% endblock %}
 {% block content %}
     {% include 'user/my_detailed.html' %}
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12" >
             {% if travels %}
                 {% for travel in travels %}
 
@@ -15,7 +15,7 @@
                     {% if user == current_user %}
                         <a class="btn btn-link" href="#">写游记</a>
                     {% else %}
-                        <a class="btn btn-link" href="#">探索</a>
+                        <a class="btn btn-link" href="{{ url_for('main.index') }}">探索</a>
                     {% endif %}
                 </div>
             {% endif %}

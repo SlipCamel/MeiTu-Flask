@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-import random, uuid
-from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request
+import os
+import random
+import uuid
+from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request, current_app, \
+    send_from_directory
+from flask_ckeditor import upload_success, upload_fail
 from flask_login import login_required, current_user, logout_user
 
 from MeiTu import User
@@ -10,7 +14,7 @@ from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, C
 from MeiTu.extensions import db, avatars, cache
 from MeiTu.models import Travels, TravelHead
 from MeiTu.settings import Operations
-from MeiTu.utils import redirect_back, generate_token, validate_token, rename_image
+from MeiTu.utils import redirect_back, generate_token, validate_token, rename_image, resize_rename_img
 from MeiTu.decorators import confirm_mail
 
 user_bp = Blueprint('user', __name__)
@@ -21,17 +25,17 @@ user_bp = Blueprint('user', __name__)
 def index(username):
     if username == current_user.username:
         travel = User.query.filter_by(username=username).first()
-        print(travel.travels)
-        for i in travel.travels:
-            print(i.travel_head.filename)
+        # print(travel.travels)
+        # for i in travel.travels:
+        #     print(i.travel_head.filename)
     return render_template('user/index.html')
 
 
-@user_bp.route('/my_index/<username>')
-def my_index(username):
+@user_bp.route('/user_index/<username>')
+def user_index(username):
     user = User.query.filter_by(username=username).first_or_404()
 
-    return render_template('user/my_index.html', user=user)
+    return render_template('user/user_index.html', user=user)
 
 
 @user_bp.route('/write_travels', methods=['POST', 'GET'])
@@ -55,6 +59,53 @@ def write_travels():
     return render_template('user/write_travels.html', form=form)
 
 
+@user_bp.route('/travels/<int:travel_id>/edit', methods=['POST', 'GET'])
+@login_required
+@confirm_mail
+def edit_travels(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    form = WriteTravelsForm()
+
+    if form.validate_on_submit():
+        travel.title = form.title.data
+        travel.body = form.body.data
+        try:
+            flash('修改游记成功', 'success')
+            db.session.commit()
+            return redirect(url_for('main.show_travels', travel_id=travel_id))
+        except Exception as e:
+            db.session.rollback()
+            print('SQL EXCEPTION:' + str(e))
+    form.title.data = travel.title
+    form.body.data = travel.body
+    return render_template('user/edit_travels.html', form=form)
+
+
+@user_bp.route('/upload', methods=['POST', 'GET'])
+@login_required
+def upload():
+    f = request.files.get('upload')
+    extension = f.filename.split('.')[1].lower()
+    if extension not in ['jpg', 'png', 'gif', 'jpeg']:
+        return upload_fail(message='IMAGE ONLY')
+    path = current_app.config['FILE_UPLOAD']
+    filename = resize_rename_img(image=f, filename=f.filename, path=path)
+    url = url_for('user.show_upload', filename=filename)
+    return upload_success(url=url, filename=filename)
+
+
+@user_bp.route('/files/<path:filename>')
+def show_upload(filename):
+    path = current_app.config['FILE_UPLOAD']
+    return send_from_directory(path, filename)
+
+
+@user_bp.route('/head_img/<path:filename>')
+def show_head(filename):
+    path = current_app.config['DROPZONE_FILE_UPLOAD']
+    return send_from_directory(path, filename)
+
+
 @user_bp.route('/set_head/<uid>', methods=['POST', 'GET'])
 @login_required
 @confirm_mail
@@ -63,7 +114,8 @@ def set_head(uid):
         travel = Travels.query.filter_by(uid=uid).first()
 
         f = request.files.get('file')
-        filename = rename_image(f.filename)
+        path = current_app.config['DROPZONE_FILE_UPLOAD']
+        filename = resize_rename_img(image=f, filename=f.filename, path=path, base_width=230)
 
         if travel.travel_head:
             travel.travel_head.filename = filename

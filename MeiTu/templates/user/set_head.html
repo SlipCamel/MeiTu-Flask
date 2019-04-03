@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}写游记 - {% endblock %}
+{% block title %}上传头图 - {% endblock %}
 
 {% block styles %}
     {{ super() }}
@@ -9,13 +9,13 @@
 
 {% block content %}
     <div class="page-header">
-        <h1>写游记</h1>
+        <h1>上传头图</h1>
     </div>
     <div class="row">
         <div class="col-md-12">
             {{ dropzone.create(action=url_for('user.set_head', uid=uid)) }}
             <a class="btn btn-light float-right" href="{{ url_for('user.index', username=current_user.username) }}">
-                Done
+                完成
             </a>
         </div>
     </div>
