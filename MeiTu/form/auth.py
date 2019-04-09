@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp
+from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, ValidationError
+
+from MeiTu import User
 
 
 class LoginForm(FlaskForm):
@@ -22,6 +24,14 @@ class RegisterForm(FlaskForm):
                         validators=[DataRequired(), Length(1, 254), Email()])
     nick_name = StringField('昵称', render_kw={'placeholder': '请输入昵称'}, validators=[DataRequired(), Length(1, 12)])
     submit = SubmitField('立即注册')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data.lower()).first():
+            raise ValidationError('邮箱已经存在！')
+
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('用户名已经存在！')
 
 
 class ForgetPasswordForm(FlaskForm):

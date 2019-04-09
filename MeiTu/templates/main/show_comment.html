@@ -1,0 +1,127 @@
+<div class="comments" id="comments">
+    <h3>{{ travel.comments|length }} 评论
+        <small>
+            <a href="{{ url_for('main.show_travels', travel_id=travel.id, page=pagination.pages or 1) }}#comment-form">latest</a>
+        </small>
+        {% if current_user == travel.author %}
+            <form class="inline" method="post" action="{{ url_for('user.set_comment', travel_id=travel.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-xs btn-link float-right">
+                    {% if travel.can_comment %}关闭{% else %}开启{% endif %}评论
+                </button>
+            </form>
+        {% endif %}
+    </h3>
+    <hr>
+    {% if comments %}
+        {% for comment in comments %}
+            <div class="comment">
+                <div class="comment-thumbnail">
+                    <a href="{{ url_for('user.user_index', username=comment.author.username) }}">
+                        <img class="rounded img-fluid avatar-s profile-popover"
+                             data-href="#"
+                             src="{{ url_for('main.get_avatar', filename=comment.author.avatar_m) }}">
+
+                    </a>
+                </div>
+                <div class="comment-body">
+                    <h6>
+                        <a class="profile-popover"
+                           data-href="#"
+                           href="{{ url_for('user.user_index', username=comment.author.username) }}">
+                            {{ comment.author.nick_name }}
+                        </a>
+                        {% if comment.author == travel.author %}
+                            <span class="badge badge-light">Author</span>
+                        {% endif %}
+                        <small data-toggle="tooltip" data-placement="top" data-timestamp="{{ comment.timestamp }}"
+                               data-delay="500">
+                            {{ moment(comment.timestamp).fromNow(refresh=True) }}
+                        </small>
+                        {% if current_user.is_authenticated %}
+                            <span class="float-right">
+                            <span class="dropdown">
+                                <button class="btn btn-sm btn-light" type="button" id="dropdownMenuButton"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                <span class="oi oi-ellipses"></span>
+                                </button>
+                                <span class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {% if current_user != comment.author %}
+                                    <a class="dropdown-item btn"
+                                       href="{{ url_for('user.reply_comment', comment_id=comment.id) }}">
+                                        <span class="oi oi-comment-square"></span> 回复
+                                    </a>
+                                {% endif %}
+                                    {% if current_user == comment.author or current_user == travel.author %}
+                                        <a class="dropdown-item" data-toggle="modal" href="#!"
+                                           data-href="{{ url_for('user.delete_comment', comment_id=comment.id) }}"
+                                           data-target="#confirm-delete">
+                                            <span class="oi oi-trash" aria-hidden="true"></span> 删除
+                                        </a>
+                                    {% endif %}
+                                    {% if current_user != comment.author %}
+                                        <form class="inline" method="post"
+                                              action="#">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="oi oi-warning" aria-hidden="true"></span> 举报
+                                      </button>
+                                </form>
+                                    {% endif %}
+                                </span>
+                                </span>
+                            </span>
+                        {% endif %}
+                    </h6>
+                    <p>
+                        {% if comment.replied %}
+                            Reply
+                            <a href="{{ url_for('user.index', username=comment.replied.author.username) }}">{{ comment.replied.author.nick_name }}</a>
+                            :
+                        {% endif %}
+                        {{ comment.body }}
+                    </p>
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+        <div class="page-footer">
+            {{ render_pagination(pagination) }}
+        </div>
+    {% else %}
+        <p class="tip">No comments.</p>
+    {% endif %}
+
+    {% if travel.can_comment %}
+        {% if current_user.is_authenticated %}
+            {% if request.args.get('reply') %}
+                <div class="alert alert-dark">
+                    Reply to {{ request.args.get('author') }}:
+                    <a class="float-right" href="{{ url_for('main.show_travels', travel_id=travel.id) }}">Cancel</a>
+                </div>
+            {% endif %}
+            <div class="comment-form-area">
+                <div class="comment-form-thumbnail">
+                    <img class="rounded img-fluid avatar-s"
+                         src="{{ url_for('main.get_avatar', filename=current_user.avatar_m) }}">
+                </div>
+                <div class="comment-form" id="comment-form">
+                    {{ render_form(comment_form, action=url_for('user.new_comment', travel_id=travel.id, page=pagination.pages or 1,
+                        reply=request.args.get('reply')),
+                        extra_classes="text-right") }}
+                </div>
+            </div>
+        {% else %}
+            <p class="tip">
+                <a href="{{ url_for('auth.login') }}">登录</a>
+                /
+                <a href="{{ url_for('auth.register') }}">注册</a> 即可评论。
+            </p>
+        {% endif %}
+    {% else %}
+        <p class="tip">
+            评论已关闭.
+        </p>
+    {% endif %}
+</div>

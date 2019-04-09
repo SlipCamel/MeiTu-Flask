@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'bootstrap/form.html' import render_form %}
 {% block content %}
 
     <div class="row justify-content-md-center">
@@ -15,31 +17,58 @@
             {% if current_user == travel.author %}
                 <a class="btn btn-primary btn-sm text-white"
                    href="{{ url_for('user.edit_travels', travel_id=travel.id) }}">编辑文章</a>
-                <a class="btn btn-danger btn-sm text-white" href="">删除</a>
+                <a class="btn btn-danger btn-sm text-white" data-toggle="modal" data-target="#confirm-delete"
+                   data-href="{{ url_for('user.delete_travel', travel_id=travel.id) }}">删除</a>
             {% endif %}
             <a class="btn btn-primary btn-sm text-white" data-toggle="modal" data-target="#share-modal">分享</a>
-        </div>
-
-        <div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="shareModalLabel">Permalink</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body w-100">
-                        <input class="form-control"
-                               value="{{ url_for('main.show_travels', travel_id=travel.id, _external=True) }}"
-                               readonly>
-                    </div>
-                </div>
-            </div>
+        {% include 'main/show_comment.html' %}
         </div>
         <div class="col-md-4">
             {% include 'main/travel_sidebar.html' %}
         </div>
     </div>
+    <!-- share modal -->
+    <div class="modal fade" id="share-modal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">Permalink</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body w-100">
+                    <input class="form-control"
+                           value="{{ url_for('main.show_travels', travel_id=travel.id, _external=True) }}"
+                           readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- delete confirm modal -->
+    {% if current_user.is_authenticated %}
+        <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel">警告！</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>确定要删除此项吗?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form class="delete-form" action="" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button class="btn btn-danger btn-confirm" type="submit">确定</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+    {% endif %}
 {% endblock %}

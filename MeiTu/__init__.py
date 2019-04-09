@@ -30,10 +30,12 @@ def register_blueprint(app):
     from MeiTu.blueprint.auth import auth_bp
     from MeiTu.blueprint.main import main_bp
     from MeiTu.blueprint.user import user_bp
+    from MeiTu.blueprint.ajax import ajax_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(ajax_bp, url_prefix='/ajax')
 
 
 def register_extensions(app):
@@ -86,7 +88,7 @@ def register_commands(app):
             user.username = username
             user.set_password(password)
         else:
-            user = User(username='admin')
+            user = User(username='admin', email='123@1.com', confirmed=True)
             user.set_password(password)
             db.session.add(user)
         db.session.commit()

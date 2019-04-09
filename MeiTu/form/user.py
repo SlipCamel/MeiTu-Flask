@@ -53,3 +53,8 @@ class WriteTravelsForm(FlaskForm):
     title = StringField('标题', validators=[DataRequired(), Length(1, 60)])
     body = CKEditorField('内容', validators=[DataRequired()])
     submit = SubmitField('完成')
+
+
+class CommentForm(FlaskForm):
+    body = TextAreaField('内容', validators=[DataRequired()])
+    submit = SubmitField()

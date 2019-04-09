@@ -3,16 +3,16 @@ import os
 import random
 import uuid
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request, current_app, \
-    send_from_directory
+    send_from_directory, abort
 from flask_ckeditor import upload_success, upload_fail
 from flask_login import login_required, current_user, logout_user
 
 from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm, \
-    WriteTravelsForm
+    WriteTravelsForm, CommentForm
 from MeiTu.extensions import db, avatars, cache
-from MeiTu.models import Travels, TravelHead
+from MeiTu.models import Travels, TravelHead, Comment
 from MeiTu.settings import Operations
 from MeiTu.utils import redirect_back, generate_token, validate_token, rename_image, resize_rename_img
 from MeiTu.decorators import confirm_mail
@@ -24,10 +24,12 @@ user_bp = Blueprint('user', __name__)
 @login_required
 def index(username):
     if username == current_user.username:
-        travel = User.query.filter_by(username=username).first()
-        # print(travel.travels)
-        # for i in travel.travels:
-        #     print(i.travel_head.filename)
+        user = User.query.filter_by(username=username).first()
+        page = request.args.get('page', 1, type=int)
+        per_page = current_app.config['MEITU_TRAVELS_PER_PAGE']
+        pagination = Travels.query.with_parent(user).paginate(page, per_page=per_page)
+        travels = pagination.items
+        return render_template('user/index.html', pagination=pagination, travels=travels, length=len)
     return render_template('user/index.html')
 
 
@@ -79,6 +81,22 @@ def edit_travels(travel_id):
     form.title.data = travel.title
     form.body.data = travel.body
     return render_template('user/edit_travels.html', form=form)
+
+
+@user_bp.route('/delete/travel/<int:travel_id>', methods=['POST'])
+@login_required
+def delete_travel(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    if current_user != travel.author:
+        abort(403)
+    try:
+        db.session.delete(travel)
+        db.session.commit()
+        flash('文章已删除', 'info')
+    except Exception as e:
+        db.session.rollback()
+        print('SQL EXCEPTION:' + str(e))
+    return redirect(url_for('user.index', username=travel.author.username))
 
 
 @user_bp.route('/upload', methods=['POST', 'GET'])
@@ -140,7 +158,7 @@ def edit_profile():
         current_user.biography = form.biography.data
         db.session.commit()
         flash('个人信息修改成功！', 'success')
-        return redirect(url_for('user.my_index', username=current_user.username))
+        return redirect(url_for('user.user_index', username=current_user.username))
 
     form.nick_name.data = current_user.nick_name
     form.biography.data = current_user.biography
@@ -257,3 +275,74 @@ def change_email_confirm(token):
     else:
         flash('邮箱更改失败，链接过期或失效。', 'warning')
         return redirect(url_for('user.change_email', username=current_user.username))
+
+
+@user_bp.route('/set-comment/<int:travel_id>', methods=['POST'])
+@login_required
+def set_comment(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    if current_user != travel.author:
+        abort(403)
+
+    if travel.can_comment:
+        travel.can_comment = False
+        flash('评论已关闭.', 'info')
+    else:
+        travel.can_comment = True
+        flash('评论已开启.', 'info')
+    db.session.commit()
+    return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+
+@user_bp.route('/travel/<int:travel_id>/comment/new', methods=['POST'])
+@login_required
+def new_comment(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    page = request.args.get('page', 1, type=int)
+    form = CommentForm()
+    if form.validate_on_submit():
+        body = form.body.data
+        author = current_user._get_current_object()
+        comment = Comment(body=body, author=author, travel=travel)
+
+        replied_id = request.args.get('reply')
+        if replied_id:
+            comment.replied = Comment.query.get_or_404(replied_id)
+
+        try:
+            db.session.add(comment)
+            db.session.commit()
+            flash('评论成功', 'success')
+        except Exception as e:
+            db.session.rollback()
+            print('SQL EXCEPTION:' + str(e))
+
+    flash_errors(form)
+    return redirect(url_for('main.show_travels', travel_id=travel_id, page=page))
+
+
+@user_bp.route('/delete/comment/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if current_user != comment.author and current_user != comment.travel.author:
+        abort(403)
+
+    try:
+        db.session.delete(comment)
+        db.session.commit()
+        flash('评论删除成功', 'info')
+    except Exception as e:
+        db.session.rollback()
+        print('SQL EXCEPTION:' + str(e))
+
+    return redirect(url_for('main.show_travels', travel_id=comment.travel_id))
+
+
+@user_bp.route('/reply/comment/<int:comment_id>')
+@login_required
+def reply_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    return redirect(
+        url_for('main.show_travels', travel_id=comment.travel_id, reply=comment_id,
+                author=comment.author.nick_name) + '#comment-form')

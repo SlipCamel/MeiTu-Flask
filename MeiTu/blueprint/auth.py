@@ -50,7 +50,7 @@ def register():
             db.session.add(user)
             db.session.commit()
             token = generate_token(user, operation=Operations.CONFIRM)
-            send_confirm_email(user, token)
+            # send_confirm_email(user, token)
             flash('确认邮件已发出，请到邮箱确认', 'info')
         except Exception as e:
             db.session.rollback()

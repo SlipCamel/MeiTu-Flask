@@ -5,14 +5,61 @@
 
 {% block content %}
     {% if current_user.is_authenticated %}
-        <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center" style="margin-top: 2rem">
             <div class="col-md-8">
                 {% if travels %}
-
+                    {% for travel in travels %}
+                        <div class="tn-item list-group-item-action">
+                            <div class="tn-image">
+                                <a{% if current_user == travel.author %}
+                                    href="{{ url_for('user.set_head', uid=travel.uid) }}"
+                                {% else %}
+                                    href="{{ url_for('main.show_travels', travel_id=travel.id) }}"
+                                {% endif %}>
+                                    <img src="{{ url_for('user.show_head', filename=travel.travel_head.filename) }}"
+                                         style="width: 100%;height: 100%;margin-left: 10px;"/>
+                                </a>
+                            </div>
+                            <div class="tn-wrapper ">
+                                <dl>
+                                    <dt>
+                                        <a href="{{ url_for('main.show_travels', travel_id=travel.id) }}">
+                                            {{ travel.title }}
+                                        </a>
+                                    </dt>
+                                    <dd>
+                                        <a href="{{ url_for('main.show_travels', travel_id=travel.id) }}">
+                                            {% if length(travel.body)>130 %}
+                                                {{ travel.body|striptags|truncate(150) }}
+                                            {% else %}
+                                                {{ travel.body|striptags }}
+                                            {% endif %}
+                                        </a>
+                                    </dd>
+                                </dl>
+                                <div class="tn-extra">
+                            <span class="tn-user">
+                                <a href="{{ url_for('user.user_index', username=travel.author.username) }}"
+                                   rel="nofollow"
+                                   style="color: #000000;">
+                                    <img class="avatar-xs"
+                                         src="{{ url_for('main.get_avatar', filename=travel.author.avatar_s) }}">
+                                        {{ travel.author.nick_name }}
+                                </a>
+                            </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="f-list">
+                        {% if travels %}
+                            <div class="page-footer">{{ render_pagination(pagination, fragment='jump_here') }}</div>
+                        {% endif %}
+                    </div>
                 {% else %}
                     <div class="tip text-center">
                         <h3>还未有游记.</h3>
-                        <p><a href="#">探索一下</a></p>
+                        <p><a href="{{url_for('user.write_travels') }}">写游记</a></p>
                     </div>
                 {% endif %}
             </div>

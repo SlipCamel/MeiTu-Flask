@@ -7,7 +7,7 @@
             </a>
             <div class="sidebar-nav-name">
                 <h6 class="card-title">
-                    <a href="#">
+                    <a href="{{ url_for('user.user_index', username=current_user.username) }}">
                         {{ current_user.nick_name }}
                     </a>
                 </h6>

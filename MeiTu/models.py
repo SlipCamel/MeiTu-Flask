@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     biography = db.Column(db.String(120))
     location = db.Column(db.String(50))
 
+    comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')
 
     # 头像相关
@@ -57,15 +58,34 @@ class Travels(db.Model):
     uid = db.Column(db.String(30), unique=True)
     title = db.Column(db.String(60))
     body = db.Column(db.Text)
+    can_comment = db.Column(db.Boolean, default=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     author = db.relationship('User', back_populates='travels')
     travel_head = db.relationship('TravelHead', uselist=False, cascade='all, delete-orphan')
+    comments = db.relationship('Comment', back_populates='travel', cascade='all, delete-orphan')
 
 
 class TravelHead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(60))
+
     travels_id = db.Column(db.Integer, db.ForeignKey('travels.id'))
+
     travels = db.relationship('Travels')
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    travel_id = db.Column(db.Integer, db.ForeignKey('travels.id'))
+    replied_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
+
+    author = db.relationship('User', back_populates='comments')
+    travel = db.relationship('Travels', back_populates='comments')
+    replies = db.relationship('Comment', back_populates='replied', cascade='all, delete-orphan')
+    replied = db.relationship('Comment', back_populates='replies', remote_side=[id])
