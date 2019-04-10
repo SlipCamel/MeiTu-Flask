@@ -346,3 +346,31 @@ def reply_comment(comment_id):
     return redirect(
         url_for('main.show_travels', travel_id=comment.travel_id, reply=comment_id,
                 author=comment.author.nick_name) + '#comment-form')
+
+
+@user_bp.route('/collect/<int:travel_id>', methods=['POST'])
+@login_required
+@confirm_mail
+def collect(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    if current_user.is_collecting(travel):
+        flash('游记已收藏', 'info')
+        return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+    current_user.collect(travel)
+    flash('收藏成功', 'success')
+
+    return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+
+@user_bp.route('/uncollect/<int:travel_id>', methods=['POST'])
+@login_required
+def uncollect(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    if not current_user.is_collecting(travel):
+        flash('您还未收藏此游记', 'info')
+        return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+    current_user.uncollect(travel)
+    flash('取消收藏成功.', 'info')
+    return redirect(url_for('main.show_travels', travel_id=travel_id))

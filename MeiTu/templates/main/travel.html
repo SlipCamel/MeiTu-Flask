@@ -13,7 +13,10 @@
                     <span class="oi oi-clock"></span> 发布日期: {{ moment(travel.timestamp).format('LL') }}
                 </small>
             </div>
-            {{ travel.body|safe }}
+            <div class="travel">
+                {{ travel.body|safe }}
+            </div>
+
             {% if current_user == travel.author %}
                 <a class="btn btn-primary btn-sm text-white"
                    href="{{ url_for('user.edit_travels', travel_id=travel.id) }}">编辑文章</a>
@@ -32,7 +35,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="shareModalLabel">Permalink</h5>
+                    <h5 class="modal-title" id="shareModalLabel">链接</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

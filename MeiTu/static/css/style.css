@@ -466,7 +466,7 @@ footer {
     box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Photo Page */
+/* Travel Page */
 #tag-form, #description-form {
     display: none;
     margin: 20px 0;
@@ -485,4 +485,13 @@ footer {
     z-index: 1;
     left: 50%;
     bottom: 30px;
+}
+
+.travel{
+    width: 100%;
+    height: auto;
+    word-wrap:break-word;
+    word-break:break-all;
+    overflow: hidden;
+
 }

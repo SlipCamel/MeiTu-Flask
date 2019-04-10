@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 from datetime import datetime
 
+from flask import current_app
 from flask_avatars import Identicon
 
 from MeiTu.extensions import db
@@ -22,7 +24,7 @@ class User(db.Model, UserMixin):
 
     comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')
-
+    collections = db.relationship('Collect', back_populates='collector', cascade='all')
     # 头像相关
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
@@ -38,6 +40,21 @@ class User(db.Model, UserMixin):
 
     def validate_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def collect(self, travel):
+        if not self.is_collecting(travel):
+            collect = Collect(collector=self, collected=travel)
+            db.session.add(collect)
+            db.session.commit()
+
+    def uncollect(self, travel):
+        collect = Collect.query.with_parent(self).filter_by(collected_id=travel.id).first()
+        if collect:
+            db.session.delete(collect)
+            db.session.commit()
+
+    def is_collecting(self, travel):
+        return Collect.query.with_parent(self).filter_by(collected_id=travel.id).first()
 
     @property
     def is_active(self):
@@ -65,6 +82,7 @@ class Travels(db.Model):
     author = db.relationship('User', back_populates='travels')
     travel_head = db.relationship('TravelHead', uselist=False, cascade='all, delete-orphan')
     comments = db.relationship('Comment', back_populates='travel', cascade='all, delete-orphan')
+    collectors = db.relationship('Collect', back_populates='collected', cascade='all')
 
 
 class TravelHead(db.Model):
@@ -89,3 +107,12 @@ class Comment(db.Model):
     travel = db.relationship('Travels', back_populates='comments')
     replies = db.relationship('Comment', back_populates='replied', cascade='all, delete-orphan')
     replied = db.relationship('Comment', back_populates='replies', remote_side=[id])
+
+
+class Collect(db.Model):
+    collector_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    collected_id = db.Column(db.Integer, db.ForeignKey('travels.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    collector = db.relationship('User', back_populates='collections', lazy='joined')
+    collected = db.relationship('Travels', back_populates='collectors', lazy='joined')

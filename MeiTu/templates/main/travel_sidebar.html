@@ -14,3 +14,41 @@
         </div>
     </div>
 </div>
+<div class="card bg-light mb-3 w-100">
+    <div class="card-body">
+        <div id="tags">
+            <p>
+                此处是标签
+            </p>
+        </div>
+        {% if not current_user == travel.author %}
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_collecting(travel) %}
+                    <form class="inline" method="post"
+                          action="{{ url_for('user.uncollect', travel_id=travel.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                            <span class="oi oi-x"></span> 取消收藏
+                        </button>
+                    </form>
+                {% else %}
+                    <form class="inline" method="post"
+                          action="{{ url_for('user.collect', travel_id=travel.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            <span class="oi oi-star"></span> 收藏
+                        </button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <a class="btn btn-primary btn-sm text-white" href="{{ url_for('auth.login') }}">
+                    <span class="oi oi-star"></span>收藏
+                </a>
+            {% endif %}
+        {% endif %}
+        {% if travel.collectors %}
+            <a href="{{ url_for('main.show_collectors', travel_id=travel.id) }}">{{ travel.collectors|length }}
+                人已收藏</a>
+        {% endif %}
+    </div>
+</div>
