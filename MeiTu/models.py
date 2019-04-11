@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     confirmed = db.Column(db.Boolean, default=False)
     biography = db.Column(db.String(120))
     location = db.Column(db.String(50))
+    public_collections = db.Column(db.Boolean, default=True)
 
     comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')
@@ -88,6 +89,7 @@ class Travels(db.Model):
 class TravelHead(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(60))
+    filename_m = db.Column(db.String(60))
 
     travels_id = db.Column(db.Integer, db.ForeignKey('travels.id'))
 

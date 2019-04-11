@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, current_app, send_from_directory, request
 
 from MeiTu.form.user import CommentForm
-from MeiTu.models import Travels, Comment, Collect
+from MeiTu.models import Travels, Comment, Collect, User
 
 main_bp = Blueprint('main', __name__)
 
@@ -38,6 +38,16 @@ def show_collectors(travel_id):
     pagination = Collect.query.with_parent(travel).order_by(Collect.timestamp.asc()).paginate(page, per_page)
     collects = pagination.items
     return render_template('main/collectors.html', collects=collects, travel=travel, pagination=pagination)
+
+
+@main_bp.route('/<username>/collections')
+def show_collections(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['MEITU_TRAVELS_USER_PER_PAGE']
+    pagination = Collect.query.with_parent(user).order_by(Collect.timestamp.desc()).paginate(page, per_page)
+    collects = pagination.items
+    return render_template('main/show_collections.html', collects=collects, pagination=pagination, user=user)
 
 
 @main_bp.route('/avatars/<path:filename>')

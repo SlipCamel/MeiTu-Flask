@@ -6,20 +6,21 @@
     {% include 'user/my_detailed.html' %}
     <div class="row">
         <div class="col-md-12" >
-            {% if travels %}
-                {% for travel in travels %}
-                    {{ travel_card(travel) }}
+        {% if user.public_collections or current_user==user%}
+            {% if collects %}
+                {% for collect in collects %}
+                    {{ travel_card(collect.collected) }}
                 {% endfor %}
             {% else %}
                 <div class="tip text-center">
-                    <h3>没有游记</h3>
-                    {% if user == current_user %}
-                        <a class="btn btn-link" href="#">写游记</a>
-                    {% else %}
-                        <a class="btn btn-link" href="{{ url_for('main.index') }}">探索</a>
-                    {% endif %}
+                    <h3>没有收藏</h3>
                 </div>
             {% endif %}
+        {% else %}
+            <div class="tip">
+                <h3>收藏不可见</h3>
+            </div>
+        {% endif %}
         </div>
     </div>
     {% if travels %}

@@ -8,3 +8,20 @@
         </h6>
     </div>
 {% endmacro %}
+
+{% macro travel_card(travel) %}
+    <div class="photo-card card">
+        <a class="card-thumbnail" href="{{ url_for('main.show_travels', travel_id=travel.id) }}">
+            <img class="card-img-top portrait" src="{{ url_for('user.show_head', filename=travel.travel_head.filename_m) }}">
+        </a>
+        <div class="card-body">
+            <a href="{{ url_for('main.show_travels', travel_id=travel.id) }}" style="color: #333333;font-weight: 700">
+                {{ travel.title|truncate(45) }}
+            </a>
+        </div>
+        <div class="card-body">
+            <span class="oi oi-star"></span> {{ travel.collectors|length }}
+            <span class="oi oi-comment-square"></span> {{ travel.comments|length }}
+        </div>
+    </div>
+{% endmacro %}

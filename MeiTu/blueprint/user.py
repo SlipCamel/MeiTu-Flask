@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import random
 import uuid
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify, request, current_app, \
@@ -10,11 +9,11 @@ from flask_login import login_required, current_user, logout_user
 from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm, \
-    WriteTravelsForm, CommentForm
+    WriteTravelsForm, CommentForm, PrivacySettingForm
 from MeiTu.extensions import db, avatars, cache
 from MeiTu.models import Travels, TravelHead, Comment
 from MeiTu.settings import Operations
-from MeiTu.utils import redirect_back, generate_token, validate_token, rename_image, resize_rename_img
+from MeiTu.utils import redirect_back, generate_token, validate_token, resize_rename_img
 from MeiTu.decorators import confirm_mail
 
 user_bp = Blueprint('user', __name__)
@@ -36,8 +35,11 @@ def index(username):
 @user_bp.route('/user_index/<username>')
 def user_index(username):
     user = User.query.filter_by(username=username).first_or_404()
-
-    return render_template('user/user_index.html', user=user)
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['MEITU_TRAVELS_USER_PER_PAGE']
+    pagination = Travels.query.with_parent(user).paginate(page, per_page)
+    travels = pagination.items
+    return render_template('user/user_index.html', user=user, travels=travels, pagination=pagination)
 
 
 @user_bp.route('/write_travels', methods=['POST', 'GET'])
@@ -134,11 +136,13 @@ def set_head(uid):
         f = request.files.get('file')
         path = current_app.config['DROPZONE_FILE_UPLOAD']
         filename = resize_rename_img(image=f, filename=f.filename, path=path, base_width=230)
+        filename_m = resize_rename_img(image=f, filename=f.filename, path=path, base_width=400)
 
         if travel.travel_head:
             travel.travel_head.filename = filename
+            travel.travel_head.filename_m = filename_m
         else:
-            travel_head = TravelHead(travels=travel, filename=filename)
+            travel_head = TravelHead(travels=travel, filename=filename, filename_m=filename_m)
             db.session.add(travel_head)
         try:
             db.session.commit()
@@ -275,6 +279,19 @@ def change_email_confirm(token):
     else:
         flash('邮箱更改失败，链接过期或失效。', 'warning')
         return redirect(url_for('user.change_email', username=current_user.username))
+
+
+@user_bp.route('/settings/edit_privacy', methods=['POST', 'GET'])
+@login_required
+def privacy_settings():
+    form = PrivacySettingForm()
+    if form.validate_on_submit():
+        current_user.public_collections = form.public_collections.data
+        db.session.commit()
+        flash('隐私设置已更改', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    form.public_collections.data = current_user.public_collections
+    return render_template('user/settings/edit_privacy.html', form=form)
 
 
 @user_bp.route('/set-comment/<int:travel_id>', methods=['POST'])

@@ -58,3 +58,8 @@ class WriteTravelsForm(FlaskForm):
 class CommentForm(FlaskForm):
     body = TextAreaField('内容', validators=[DataRequired()])
     submit = SubmitField()
+
+
+class PrivacySettingForm(FlaskForm):
+    public_collections = BooleanField('公开我的收藏')
+    submit = SubmitField('更改')

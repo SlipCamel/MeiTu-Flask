@@ -31,6 +31,7 @@ class BaseConfig(object):
     MEITU_UPLOAD_PATH = os.path.join(basedir, 'uploads')
     MEITU_MAIL_SUBJECT_PREFIX = '[美途]'
     MEITU_TRAVELS_PER_PAGE = 10
+    MEITU_TRAVELS_USER_PER_PAGE = 9
 
     AVATARS_SAVE_PATH = os.path.join(MEITU_UPLOAD_PATH, 'avatars')
     AVATARS_SIZE_TUPLE = (30, 100, 200)
