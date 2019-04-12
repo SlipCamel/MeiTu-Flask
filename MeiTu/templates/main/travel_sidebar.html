@@ -18,9 +18,43 @@
     <div class="card-body">
         <div id="tags">
             <p>
-                此处是标签
+                {% if travel.tags %}
+                    {% for tag in travel.tags %}
+                        <a class="badge badge-light"
+                           href="{{ url_for('main.show_tag', tag_id=tag.id) }}" target="_blank"><span
+                                class="oi oi-tag"></span> {{ tag.name }}</a>
+                    {% endfor %}
+                {% endif %}
+                {% if current_user == travel.author %}
+                    <a id="tag-btn" href="#!">
+                        <small><span class="oi oi-pencil"></span> 编辑标签</small>
+                    </a>
+                {% endif %}
             </p>
         </div>
+        {% if current_user == travel.author %}
+            <div id="tag-form">
+                <form action="{{ url_for('user.new_tag', travel_id=travel.id) }}" method="post">
+                    {{ tag_form.csrf_token }}
+                    {{ render_field(tag_form.tag) }}
+                    <a class="btn btn-light btn-sm" id="cancel-tag">取消</a>
+                    {{ render_field(tag_form.submit, class='btn btn-success btn-sm') }}
+                </form>
+                {% if travel.tags %}
+                    <hr>
+                    {% for tag in travel.tags %}
+                        <a class="dead-link" href="#!"
+                           data-href="{{ url_for('user.delete_tag', travel_id=travel.id, tag_id=tag.id) }}"
+                           data-toggle="modal" data-target="#confirm-delete" title="Delete tag">
+                            <span class="badge badge-danger">
+                                {{ tag.name }}
+                                <span class="oi oi-trash" aria-hidden="true"></span>
+                            </span>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
         {% if not current_user == travel.author %}
             {% if current_user.is_authenticated %}
                 {% if current_user.is_collecting(travel) %}

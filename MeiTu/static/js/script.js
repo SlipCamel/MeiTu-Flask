@@ -66,3 +66,13 @@ function SendEmailCode() {
 $('#confirm-delete').on('show.bs.modal', function (e) {
     $('.delete-form').attr('action', $(e.relatedTarget).data('href'));
 });
+
+// hide or show tag edit form
+$('#tag-btn').click(function () {
+    $('#tags').hide();
+    $('#tag-form').show();
+});
+$('#cancel-tag').click(function () {
+    $('#tag-form').hide();
+    $('#tags').show();
+});

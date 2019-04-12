@@ -1,5 +1,5 @@
 {% from 'bootstrap/nav.html' import render_nav_item %}
-
+{% from 'macros.html' import follow_area with context %}
 
 <div class="row" style="margin-top: 2rem">
     <div class="col-md-3">
@@ -24,6 +24,7 @@
         </p>
         <div>
             <div class="float-right">
+                {{ follow_area(user) }}
                 {% if current_user.is_authenticated and user == current_user %}
                     <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user.edit_profile') }}">Edit profile</a>
                 {% endif %}
@@ -35,6 +36,8 @@
     <ul class="nav nav-tabs">
         {{ render_nav_item('user.user_index','游记',username=user.username) }}
         {{ render_nav_item('main.show_collections','收藏',username=user.username) }}
+        {{ render_nav_item('main.show_following','关注列表',username=user.username) }}
+        {{ render_nav_item('main.show_followers','粉丝列表',username=user.username) }}
     </ul>
 </div>
 

@@ -9,6 +9,20 @@ from MeiTu.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+association_table = db.Table('association_table',
+                             db.Column('travel_id', db.Integer, db.ForeignKey('travels.id')),
+                             db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+                             )
+
+
+class Follow(db.Model):
+    follower_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    follower = db.relationship('User', foreign_keys=[follower_id], back_populates='following', lazy='joined')
+    followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,14 +32,20 @@ class User(db.Model, UserMixin):
     nick_name = db.Column(db.String(30))
     member_since = db.Column(db.DATETIME, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=True)
-    confirmed = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=True)
     biography = db.Column(db.String(120))
     location = db.Column(db.String(50))
     public_collections = db.Column(db.Boolean, default=True)
+    public_following = db.Column(db.Boolean, default=True)
+    public_followers = db.Column(db.Boolean, default=True)
 
     comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')
     collections = db.relationship('Collect', back_populates='collector', cascade='all')
+    following = db.relationship('Follow', foreign_keys=[Follow.follower_id], back_populates='follower',
+                                lazy='dynamic', cascade='all')
+    followers = db.relationship('Follow', foreign_keys=[Follow.followed_id], back_populates='followed',
+                                lazy='dynamic', cascade='all')
     # 头像相关
     avatar_s = db.Column(db.String(64))
     avatar_m = db.Column(db.String(64))
@@ -35,6 +55,7 @@ class User(db.Model, UserMixin):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.generate_avatar()
+        self.follow(self)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -56,6 +77,26 @@ class User(db.Model, UserMixin):
 
     def is_collecting(self, travel):
         return Collect.query.with_parent(self).filter_by(collected_id=travel.id).first()
+
+    def follow(self, user):
+        if not self.is_following(user):
+            follow = Follow(follower=self, followed=user)
+            db.session.add(follow)
+            db.session.commit()
+
+    def unfollow(self, user):
+        follow = self.following.filter_by(followed_id=user.id).first()
+        if follow:
+            db.session.delete(follow)
+            db.session.commit()
+
+    def is_following(self, user):
+        if user.id is None:
+            return False
+        return self.following.filter_by(followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
 
     @property
     def is_active(self):
@@ -84,6 +125,7 @@ class Travels(db.Model):
     travel_head = db.relationship('TravelHead', uselist=False, cascade='all, delete-orphan')
     comments = db.relationship('Comment', back_populates='travel', cascade='all, delete-orphan')
     collectors = db.relationship('Collect', back_populates='collected', cascade='all')
+    tags = db.relationship('Tag', back_populates='travels', secondary=association_table)
 
 
 class TravelHead(db.Model):
@@ -118,3 +160,10 @@ class Collect(db.Model):
 
     collector = db.relationship('User', back_populates='collections', lazy='joined')
     collected = db.relationship('Travels', back_populates='collectors', lazy='joined')
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True, unique=True)
+
+    travels = db.relationship('Travels', secondary=association_table, back_populates='tags')

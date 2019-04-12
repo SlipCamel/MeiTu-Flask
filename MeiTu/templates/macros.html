@@ -6,6 +6,7 @@
         <h6>
             <a href="{{ url_for('user.user_index', username=user.username) }}">{{ user.nick_name }}</a>
         </h6>
+        {{ follow_area(user) }}
     </div>
 {% endmacro %}
 
@@ -24,4 +25,32 @@
             <span class="oi oi-comment-square"></span> {{ travel.comments|length }}
         </div>
     </div>
+{% endmacro %}
+
+{% macro follow_area(user) %}
+    {% if current_user.is_authenticated %}
+        {% if user != current_user %}
+            {% if current_user.is_following(user) %}
+                <form class="inline" method="post"
+                      action="{{ url_for('user.unfollow', username=user.username, next=request.full_path) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-dark btn-sm">取消关注</button>
+                    {% if current_user.is_followed_by(user) %}
+                        <p class="badge badge-light">相互关注</p>
+                    {% endif %}
+                </form>
+            {% else %}
+                <form class="inline" method="post"
+                      action="{{ url_for('user.follow', username=user.username, next=request.full_path) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary btn-sm">关注</button>
+                    {% if current_user.is_followed_by(user) %}
+                        <p class="badge badge-light">已关注你</p>
+                    {% endif %}
+                </form>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <a class="btn btn-primary btn-sm" href="{{ url_for('auth.login') }}">关注</a>
+    {% endif %}
 {% endmacro %}

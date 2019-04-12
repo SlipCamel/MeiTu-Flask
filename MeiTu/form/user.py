@@ -62,4 +62,11 @@ class CommentForm(FlaskForm):
 
 class PrivacySettingForm(FlaskForm):
     public_collections = BooleanField('公开我的收藏')
+    public_following = BooleanField('公开我的关注')
+    public_followers = BooleanField('公开我的粉丝列表')
     submit = SubmitField('更改')
+
+
+class TagForm(FlaskForm):
+    tag = StringField('添加标签 (多个请用空格隔开)', validators=[Optional(), Length(0, 64)])
+    submit = SubmitField('添加')

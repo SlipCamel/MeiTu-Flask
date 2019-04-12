@@ -9,9 +9,9 @@ from flask_login import login_required, current_user, logout_user
 from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm, \
-    WriteTravelsForm, CommentForm, PrivacySettingForm
+    WriteTravelsForm, CommentForm, PrivacySettingForm, TagForm
 from MeiTu.extensions import db, avatars, cache
-from MeiTu.models import Travels, TravelHead, Comment
+from MeiTu.models import Travels, TravelHead, Comment, Tag
 from MeiTu.settings import Operations
 from MeiTu.utils import redirect_back, generate_token, validate_token, resize_rename_img
 from MeiTu.decorators import confirm_mail
@@ -287,10 +287,14 @@ def privacy_settings():
     form = PrivacySettingForm()
     if form.validate_on_submit():
         current_user.public_collections = form.public_collections.data
+        current_user.public_following = form.public_following.data
+        current_user.public_followers = form.public_followers.data
         db.session.commit()
         flash('隐私设置已更改', 'success')
         return redirect(url_for('user.index', username=current_user.username))
     form.public_collections.data = current_user.public_collections
+    form.public_following.data = current_user.public_following
+    form.public_followers.data = current_user.public_followers
     return render_template('user/settings/edit_privacy.html', form=form)
 
 
@@ -365,6 +369,48 @@ def reply_comment(comment_id):
                 author=comment.author.nick_name) + '#comment-form')
 
 
+@user_bp.route('/travel/<int:travel_id>/tag/new', methods=['POST'])
+@login_required
+def new_tag(travel_id):
+    travel = Travels.query.get_or_404(travel_id)
+    if current_user != travel.author:
+        abort(403)
+
+    form = TagForm()
+    if form.validate_on_submit():
+        for name in form.tag.data.split():
+            tag = Tag.query.filter_by(name=name).first()
+            if tag is None:
+                tag = Tag(name=name)
+                db.session.add(tag)
+                db.session.commit()
+            if tag not in travel.tags:
+                travel.tags.append(tag)
+                db.session.commit()
+        flash('标签添加成功', 'success')
+
+    flash_errors(form)
+    return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+
+@user_bp.route('/delete/tag/<int:travel_id>/<int:tag_id>', methods=['POST'])
+@login_required
+def delete_tag(travel_id, tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    travel = Travels.query.get_or_404(travel_id)
+    if current_user != travel.author:
+        abort(403)
+    travel.tags.remove(tag)
+    db.session.commit()
+
+    if not tag.photos:
+        db.session.delete(tag)
+        db.session.commit()
+
+    flash('标签已删除', 'info')
+    return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+
 @user_bp.route('/collect/<int:travel_id>', methods=['POST'])
 @login_required
 @confirm_mail
@@ -391,3 +437,30 @@ def uncollect(travel_id):
     current_user.uncollect(travel)
     flash('取消收藏成功.', 'info')
     return redirect(url_for('main.show_travels', travel_id=travel_id))
+
+
+@user_bp.route('/follow/<username>', methods=['POST'])
+@login_required
+@confirm_mail
+def follow(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if current_user.is_following(user):
+        flash('已关注过此用户.', 'info')
+        return redirect(url_for('user.index', username=username))
+
+    current_user.follow(user)
+    flash('关注成功.', 'success')
+    return redirect_back()
+
+
+@user_bp.route('/unfollow/<username>', methods=['POST'])
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    if not current_user.is_following(user):
+        flash('还未关注此用户.', 'info')
+        return redirect(url_for('user.index', username=username))
+
+    current_user.unfollow(user)
+    flash('取消关注成功.', 'info')
+    return redirect_back()

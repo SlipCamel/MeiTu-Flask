@@ -201,8 +201,15 @@ fabric.properties
 .idea/workspace.xml
 
 uploads/*
+!uploads/avatars
+uploads/avatars/*
+!uploads/head
+uploads/head/*
+!uploads/pic
+uploads/pic/*
 .env
 .idea
+*.db
 *.png
 *.jpg
 *.gif
