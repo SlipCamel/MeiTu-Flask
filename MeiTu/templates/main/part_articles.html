@@ -3,11 +3,11 @@
         <!--下导航-->
         <div class="navbar1">
             <ul class="tn-nav">
-                <li class=" tn-nav-hot active">
-                    <a href="#">热门游记</a>
+                <li class="tn-nav-hot {% if order == 'by_collectors' %}active{% endif %}">
+                    <a href="{{ url_for('main.index')+'#jump_here' }}">热门游记</a>
                 </li>
-                <li class=" tn-nav-new">
-                    <a href="javascript:void(0);" rel="nofollow" data-type="3">最新发表</a>
+                <li class="{% if order == 'by_time' %}active{% endif %}">
+                    <a href="{{ url_for('main.index', order='by_time')+'#jump_here' }}" rel="nofollow" data-type="3">最新发表</a>
                 </li>
             </ul>
             <div class="tn-write">

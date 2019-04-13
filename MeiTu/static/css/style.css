@@ -487,11 +487,17 @@ footer {
     bottom: 30px;
 }
 
-.travel{
+.travel {
     width: 100%;
     height: auto;
-    word-wrap:break-word;
-    word-break:break-all;
+    word-wrap: break-word;
+    word-break: break-all;
     overflow: hidden;
 
+}
+
+.comment-admin {
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: hidden;
 }

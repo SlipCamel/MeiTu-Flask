@@ -74,7 +74,7 @@
                             </span>
                         {% endif %}
                     </h6>
-                    <p>
+                    <p class="travel">
                         {% if comment.replied %}
                             Reply
                             <a href="{{ url_for('user.index', username=comment.replied.author.username) }}">{{ comment.replied.author.nick_name }}</a>

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, render_template, current_app, send_from_directory, request
+from sqlalchemy import func
 
 from MeiTu.form.user import CommentForm, TagForm
 from MeiTu.models import Travels, Comment, Collect, User, Tag
@@ -7,13 +8,21 @@ from MeiTu.models import Travels, Comment, Collect, User, Tag
 main_bp = Blueprint('main', __name__)
 
 
-@main_bp.route('/')
-def index():
+@main_bp.route('/', defaults={'order': 'by_collectors'})
+@main_bp.route('/<order>')
+def index(order):
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['MEITU_TRAVELS_PER_PAGE']
     pagination = Travels.query.paginate(page, per_page=per_page)
     travels = pagination.items
-    return render_template('main/index.html', pagination=pagination, travels=travels, length=len)
+    travels.sort(key=lambda x: len(x.collectors), reverse=True)
+
+    if order == 'by_time':
+        pagination = Travels.query.order_by(Travels.timestamp.desc()).paginate(page, per_page=per_page)
+        travels = pagination.items
+    tags = Tag.query.join(Tag.travels).group_by(Tag.id).order_by(func.count(Travels.id).desc()).limit(10).all()
+    return render_template('main/index.html', pagination=pagination, travels=travels, length=len, tags=tags,
+                           order=order)
 
 
 @main_bp.route('/travel/<int:travel_id>')

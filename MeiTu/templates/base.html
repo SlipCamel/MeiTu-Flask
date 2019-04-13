@@ -67,6 +67,11 @@
                                 <a class="dropdown-item" href="{{ url_for('user.edit_profile') }}">
                                     <span class="oi oi-cog"></span> 设置
                                 </a>
+                                {% if current_user.is_admin %}
+                                <a class="dropdown-item" href="{{ url_for('admin.index') }}">
+                                    <span class="oi oi-wrench"></span> 后台管理
+                                </a>
+                                {% endif %}
                                 <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                     <span class="oi oi-power-standby"></span> 登出
                                 </a>

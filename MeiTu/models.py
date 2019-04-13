@@ -38,6 +38,7 @@ class User(db.Model, UserMixin):
     public_collections = db.Column(db.Boolean, default=True)
     public_following = db.Column(db.Boolean, default=True)
     public_followers = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
     comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')

@@ -5,13 +5,14 @@ from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,
     send_from_directory, abort
 from flask_ckeditor import upload_success, upload_fail
 from flask_login import login_required, current_user, logout_user
+from sqlalchemy import func
 
 from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm, \
     WriteTravelsForm, CommentForm, PrivacySettingForm, TagForm
 from MeiTu.extensions import db, avatars, cache
-from MeiTu.models import Travels, TravelHead, Comment, Tag
+from MeiTu.models import Travels, TravelHead, Comment, Tag, Follow
 from MeiTu.settings import Operations
 from MeiTu.utils import redirect_back, generate_token, validate_token, resize_rename_img
 from MeiTu.decorators import confirm_mail
@@ -23,12 +24,22 @@ user_bp = Blueprint('user', __name__)
 @login_required
 def index(username):
     if username == current_user.username:
-        user = User.query.filter_by(username=username).first()
+        # 子查询实现
+        # followed_ids = db.session.query(Follow.followed_id).filter(Follow.follower_id == current_user.id).subquery()
+        # followed_travels = Travels.query.filter(Travels.author_id.in_(followed_ids)).order_by(
+        #     Travels.timestamp.desc()).all()
+        # print(followed_travels)
+
+        # 联结查询实现
+        followed_travels = Travels.query.join(Follow, Follow.followed_id == Travels.author_id).filter(
+            Follow.follower_id == current_user.id).order_by(Travels.timestamp.desc())
         page = request.args.get('page', 1, type=int)
         per_page = current_app.config['MEITU_TRAVELS_PER_PAGE']
-        pagination = Travels.query.with_parent(user).paginate(page, per_page=per_page)
+        pagination = followed_travels.paginate(page, per_page=per_page)
         travels = pagination.items
-        return render_template('user/index.html', pagination=pagination, travels=travels, length=len)
+        # tags查询
+        tags = Tag.query.join(Tag.travels).group_by(Tag.id).order_by(func.count(Travels.id).desc()).limit(10).all()
+        return render_template('user/index.html', pagination=pagination, travels=travels, length=len, tags=tags)
     return render_template('user/index.html')
 
 
