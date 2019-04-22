@@ -84,6 +84,7 @@ def resize_rename_img(image, filename, path, base_width=730):
     new_filename = uuid.uuid4().hex + ext
     img = Image.open(image)
     if img.size[0] <= base_width:
+        img.save(os.path.join(path, new_filename))
         return new_filename
     w_percent = (base_width / float(img.size[0]))
     h_size = int((float(img.size[1]) * float(w_percent)))

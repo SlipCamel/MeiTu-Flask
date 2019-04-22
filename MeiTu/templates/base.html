@@ -50,6 +50,12 @@
                         <a class="nav-item nav-link" href="{{ url_for('user.write_travels') }}" title="写游记">
                             <span class="oi oi-pencil"></span>&nbsp;&nbsp;
                         </a>
+                        <a class="nav-item nav-link" href="{{ url_for('user.show_notifications', filter='unread') }}">
+                            <span class="oi oi-bell"></span>
+                            <span id="notification-badge"
+                                  class="{% if notification_count == 0 %}hide{% endif %} badge badge-danger badge-notification"
+                                  data-href="{{ url_for('ajax.notifications_count') }}"></span>
+                        </a>
                         <div class="dropdown nav-item">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
@@ -68,9 +74,9 @@
                                     <span class="oi oi-cog"></span> 设置
                                 </a>
                                 {% if current_user.is_admin %}
-                                <a class="dropdown-item" href="{{ url_for('admin.index') }}">
-                                    <span class="oi oi-wrench"></span> 后台管理
-                                </a>
+                                    <a class="dropdown-item" href="{{ url_for('admin.index') }}">
+                                        <span class="oi oi-wrench"></span> 后台管理
+                                    </a>
                                 {% endif %}
                                 <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                     <span class="oi oi-power-standby"></span> 登出
@@ -116,6 +122,8 @@
     </div>
 </main>
 
+<div id="toast"></div>
+
 {% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.goup.min.js') }}"></script>
@@ -123,7 +131,15 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
     {{ moment.include_moment(local_js=url_for('static', filename='js/moment-with-locales.min.js')) }}
-    {{ moment.locale('zh-cn') }}
+    {{ moment.locale(auto_detect=True) }}
+    <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+        {% if current_user.is_authenticated %}
+            var is_authenticated = true;
+        {% else %}
+            var is_authenticated = false;
+        {% endif %}
+    </script>
 {% endblock %}
 </body>
 </html>

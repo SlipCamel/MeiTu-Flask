@@ -208,7 +208,7 @@ uploads/head/*
 !uploads/pic
 uploads/pic/*
 .env
-.idea
+.idea/MeiTu-Flask.iml
 *.db
 *.png
 *.jpg

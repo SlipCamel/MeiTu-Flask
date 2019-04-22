@@ -19,7 +19,7 @@
                 <div class="comment-thumbnail">
                     <a href="{{ url_for('user.user_index', username=comment.author.username) }}">
                         <img class="rounded img-fluid avatar-s profile-popover"
-                             data-href="#"
+                             data-href="{{ url_for('ajax.get_profile', user_id=comment.author.id) }}"
                              src="{{ url_for('main.get_avatar', filename=comment.author.avatar_m) }}">
 
                     </a>
@@ -27,14 +27,15 @@
                 <div class="comment-body">
                     <h6>
                         <a class="profile-popover"
-                           data-href="#"
+                           data-href="{{ url_for('ajax.get_profile', user_id=comment.author.id) }}"
                            href="{{ url_for('user.user_index', username=comment.author.username) }}">
                             {{ comment.author.nick_name }}
                         </a>
                         {% if comment.author == travel.author %}
                             <span class="badge badge-light">作者</span>
                         {% endif %}
-                        <small data-toggle="tooltip" data-placement="top" data-timestamp="{{ comment.timestamp }}"
+                        <small data-toggle="tooltip" data-placement="top"
+                               data-timestamp="{{ comment.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
                                data-delay="500">
                             {{ moment(comment.timestamp).fromNow(refresh=True) }}
                         </small>

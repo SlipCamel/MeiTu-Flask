@@ -10,9 +10,10 @@ from sqlalchemy import func
 from MeiTu import User
 from MeiTu.email_tool import send_token_email, send_change_email_email
 from MeiTu.form.user import EditProfileForm, CropAvatarForm, UploadAvatarForm, ChangePasswordForm, ChangeEmailForm, \
-    WriteTravelsForm, CommentForm, PrivacySettingForm, TagForm
+    WriteTravelsForm, CommentForm, PrivacySettingForm, TagForm, NotificationSettingForm
 from MeiTu.extensions import db, avatars, cache
-from MeiTu.models import Travels, TravelHead, Comment, Tag, Follow
+from MeiTu.models import Travels, TravelHead, Comment, Tag, Follow, Notification
+from MeiTu.notifications import push_follow_notification, push_collect_notification, push_comment_notification
 from MeiTu.settings import Operations
 from MeiTu.utils import redirect_back, generate_token, validate_token, resize_rename_img
 from MeiTu.decorators import confirm_mail
@@ -309,6 +310,23 @@ def privacy_settings():
     return render_template('user/settings/edit_privacy.html', form=form)
 
 
+@user_bp.route('/settings/notification', methods=['GET', 'POST'])
+@login_required
+def notification_setting():
+    form = NotificationSettingForm()
+    if form.validate_on_submit():
+        current_user.receive_collect_notification = form.receive_collect_notification.data
+        current_user.receive_comment_notification = form.receive_comment_notification.data
+        current_user.receive_follow_notification = form.receive_follow_notification.data
+        db.session.commit()
+        flash('提醒设置已更新', 'success')
+        return redirect(url_for('user.index', username=current_user.username))
+    form.receive_collect_notification.data = current_user.receive_collect_notification
+    form.receive_comment_notification.data = current_user.receive_comment_notification
+    form.receive_follow_notification.data = current_user.receive_follow_notification
+    return render_template('user/settings/edit_notification.html', form=form)
+
+
 @user_bp.route('/set-comment/<int:travel_id>', methods=['POST'])
 @login_required
 def set_comment(travel_id):
@@ -340,11 +358,14 @@ def new_comment(travel_id):
         replied_id = request.args.get('reply')
         if replied_id:
             comment.replied = Comment.query.get_or_404(replied_id)
-
+            if comment.replied.author.receive_comment_notification:
+                push_comment_notification(travel_id=travel.id, receiver=comment.replied.author)
         try:
             db.session.add(comment)
             db.session.commit()
             flash('评论成功', 'success')
+            if current_user != travel.author and travel.author.receive_comment_notification:
+                push_comment_notification(travel_id, receiver=travel.author, page=page)
         except Exception as e:
             db.session.rollback()
             print('SQL EXCEPTION:' + str(e))
@@ -433,7 +454,8 @@ def collect(travel_id):
 
     current_user.collect(travel)
     flash('收藏成功', 'success')
-
+    if current_user != travel.author and travel.author.receive_collect_notification:
+        push_collect_notification(collector=current_user, travel_id=travel_id, receiver=travel.author)
     return redirect(url_for('main.show_travels', travel_id=travel_id))
 
 
@@ -461,6 +483,8 @@ def follow(username):
 
     current_user.follow(user)
     flash('关注成功.', 'success')
+    if user.receive_follow_notification:
+        push_follow_notification(follower=current_user, receiver=user)
     return redirect_back()
 
 
@@ -475,3 +499,52 @@ def unfollow(username):
     current_user.unfollow(user)
     flash('取消关注成功.', 'info')
     return redirect_back()
+
+
+@user_bp.route('/notifications')
+@login_required
+def show_notifications():
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['MEITU_NOTIFICATION_PER_PAGE']
+    notifications = Notification.query.with_parent(current_user)
+    filter_rule = request.args.get('filter')
+    if filter_rule == 'unread':
+        notifications = notifications.filter_by(is_read=False)
+
+    pagination = notifications.order_by(Notification.timestamp.desc()).paginate(page, per_page)
+    notifications = pagination.items
+    return render_template('user/notifications.html', pagination=pagination, notifications=notifications)
+
+
+@user_bp.route('/notification/read/<int:notification_id>', methods=['POST'])
+@login_required
+def read_notification(notification_id):
+    notification = Notification.query.get_or_404(notification_id)
+    if current_user != notification.receiver:
+        abort(403)
+
+    notification.is_read = True
+    db.session.commit()
+    flash('设置已读成功', 'success')
+    return redirect(url_for('user.show_notifications'))
+
+
+@user_bp.route('/notifications/read/all', methods=['POST'])
+@login_required
+def read_all_notification():
+    for notification in current_user.notifications:
+        notification.is_read = True
+    db.session.commit()
+    flash('全部消息已读', 'success')
+    return redirect(url_for('user.show_notifications'))
+
+
+@user_bp.route('/notifications/clear/all', methods=['POST'])
+@login_required
+def clear_all_notification():
+    for notification in current_user.notifications:
+        if notification.is_read:
+            db.session.delete(notification)
+    db.session.commit()
+    flash('已读消息已全部清空', 'success')
+    return redirect(url_for('user.show_notifications'))

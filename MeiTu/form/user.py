@@ -70,3 +70,10 @@ class PrivacySettingForm(FlaskForm):
 class TagForm(FlaskForm):
     tag = StringField('添加标签 (多个请用空格隔开)', validators=[Optional(), Length(0, 64)])
     submit = SubmitField('添加')
+
+
+class NotificationSettingForm(FlaskForm):
+    receive_comment_notification = BooleanField('新的回复')
+    receive_follow_notification = BooleanField('新的关注')
+    receive_collect_notification = BooleanField('新的收藏')
+    submit = SubmitField('更改')

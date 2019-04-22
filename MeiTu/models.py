@@ -38,11 +38,15 @@ class User(db.Model, UserMixin):
     public_collections = db.Column(db.Boolean, default=True)
     public_following = db.Column(db.Boolean, default=True)
     public_followers = db.Column(db.Boolean, default=True)
+    receive_comment_notification = db.Column(db.Boolean, default=True)
+    receive_follow_notification = db.Column(db.Boolean, default=True)
+    receive_collect_notification = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
 
     comments = db.relationship('Comment', back_populates='author', cascade='all')
     travels = db.relationship('Travels', back_populates='author', cascade='all')
     collections = db.relationship('Collect', back_populates='collector', cascade='all')
+    notifications = db.relationship('Notification', back_populates='receiver', cascade='all')
     following = db.relationship('Follow', foreign_keys=[Follow.follower_id], back_populates='follower',
                                 lazy='dynamic', cascade='all')
     followers = db.relationship('Follow', foreign_keys=[Follow.followed_id], back_populates='followed',
@@ -168,3 +172,14 @@ class Tag(db.Model):
     name = db.Column(db.String(64), index=True, unique=True)
 
     travels = db.relationship('Travels', secondary=association_table, back_populates='tags')
+
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    receiver = db.relationship('User', back_populates='notifications')
