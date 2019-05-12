@@ -2,7 +2,7 @@
 from functools import wraps
 
 from flask_login import current_user
-from flask import redirect, url_for, flash
+from flask import redirect, url_for, flash, abort
 from markupsafe import Markup
 
 
@@ -17,5 +17,15 @@ def confirm_mail(view_func):
             )
             flash(message, 'warning')
             return redirect(url_for('user.index', username=current_user.username))
+        return view_func(*args, **kwargs)
+    return confirm
+
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def confirm(*args, **kwargs):
+        user = current_user._get_current_object()
+        if not user.is_admin:
+            abort(403)
         return view_func(*args, **kwargs)
     return confirm

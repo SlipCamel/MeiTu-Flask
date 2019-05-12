@@ -60,6 +60,7 @@ class User(db.Model, UserMixin):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.generate_avatar()
+        self.generate_bio()
         self.follow(self)
 
     def set_password(self, password):
@@ -103,6 +104,14 @@ class User(db.Model, UserMixin):
     def is_followed_by(self, user):
         return self.followers.filter_by(follower_id=user.id).first() is not None
 
+    def unlock(self):
+        self.active = True
+        db.session.commit()
+
+    def lock(self):
+        self.active = False
+        db.session.commit()
+
     @property
     def is_active(self):
         return self.active
@@ -114,6 +123,10 @@ class User(db.Model, UserMixin):
         self.avatar_s = filenames[0]
         self.avatar_m = filenames[1]
         self.avatar_l = filenames[2]
+        db.session.commit()
+
+    def generate_bio(self):
+        self.biography = '此用户没有个性签名啊啊啊'
         db.session.commit()
 
 

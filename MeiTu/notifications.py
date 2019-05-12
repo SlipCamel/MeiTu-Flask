@@ -33,3 +33,12 @@ def push_collect_notification(collector, travel_id, receiver):
     notification = Notification(message=message, receiver=receiver)
     db.session.add(notification)
     db.session.commit()
+
+
+def push_delete_notification(admin, travel):
+    travel_name = travel.title
+    author = travel.author
+    message = '管理员 <font color="blue">{}</font> 删除了你的游记 <b>{}</b>'.format(admin.username, travel_name)
+    notification = Notification(message=message, receiver=author)
+    db.session.add(notification)
+    db.session.commit()

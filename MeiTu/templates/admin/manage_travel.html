@@ -1,40 +1,42 @@
 {% extends 'admin/index.html' %}
 {% from 'bootstrap/pagination.html' import render_pagination %}
 
-{% block title %}管理标签 - {% endblock %}
+{% block title %}管理游记 - {% endblock %}
 
 {% block content %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             {{ render_breadcrumb_item('admin.index', '后台管理首页') }}
-            {{ render_breadcrumb_item('admin.manage_tag', '管理标签') }}
+            {{ render_breadcrumb_item('admin.manage_travel', '管理游记') }}
         </ol>
     </nav>
     <div class="page-header">
-        <h1>标签
+        <h1>游记
             <small class="text-muted">{{ pagination.total }}</small>
         </h1>
     </div>
-    {% if tags %}
+    {% if travels %}
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>No.</th>
-                <th width="40%">内容</th>
-                <th>数量</th>
+                <th>ID</th>
+                <th width="40%">标题</th>
+                <th>发布时间</th>
                 <th>操作</th>
             </tr>
             </thead>
-            {% for tag in tags %}
+            {% for travel in travels %}
                 <tr>
-                    <td>{{ tag.id }}</td>
-                    <td>{{ tag.name }}</td>
-                    <td><a href="{{ url_for('main.show_tag', tag_id=tag.id) }}">{{ tag.travels|length }}</a></td>
+                    <td>{{ travel.id }}</td>
+                    <td class="comment-admin"><a
+                            href="{{ url_for('main.show_travels', travel_id=travel.id) }}">{{ travel.title }}</a></td>
+                    <td>{{ moment(travel.timestamp).format('LL') }}</td>
                     <td>
-                        <form class="inline" action="{{ url_for('admin.delete_tag', tag_id=tag.id) }}" method="post">
+                        <form class="inline" action="{{ url_for('admin.delete_travel', travel_id=travel.id) }}"
+                              method="post">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="submit" onclick="return confirm('Are you sure?');"
-                                   class="btn btn-danger btn-sm" value="Delete">
+                                   class="btn btn-danger btn-sm" value="删除">
                         </form>
                     </td>
                 </tr>
@@ -42,6 +44,6 @@
         </table>
         <div class="page-footer">{{ render_pagination(pagination) }}</div>
     {% else %}
-        <div class="tip"><h5>没有标签.</h5></div>
+        <div class="tip"><h5>没有游记.</h5></div>
     {% endif %}
 {% endblock %}

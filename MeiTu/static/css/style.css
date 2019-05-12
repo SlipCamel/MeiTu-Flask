@@ -520,3 +520,42 @@ footer {
 .hide {
     display: none;
 }
+
+.search-container {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    margin-left: -260px;
+    width: 538px;
+    z-index: 5;
+}
+
+@media (max-width: 1440px) {
+    .search-container {
+        bottom: 54px;
+        width: 538px;
+        margin-left: -269px;
+    }
+}
+
+@media (max-width: 1440px) {
+    .search-group {
+        padding: 10px;
+    }
+}
+
+.search-group {
+    padding: 15px;
+    background-color: #000;
+    background-color: rgba(0, 0, 0, .6);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+
+.search-tab {
+    margin-bottom: 7px;
+    color: #fff;
+    line-height: 26px;
+    font-size: 14px;
+}
+

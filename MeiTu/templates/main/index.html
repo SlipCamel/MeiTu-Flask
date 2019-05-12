@@ -22,7 +22,24 @@
                 <img src="{{ url_for('static', filename='img/101.jpg') }}">
             </div>
         </div>
-
+        <div class="search-container">
+            <div class="search-group">
+                <div class="search-tab">
+                    <ul style="padding-left: 0px">
+                        <li style="list-style: none">
+                            查询游记、用户、标签
+                        </li>
+                    </ul>
+                </div>
+                <form class="form-inline my-2 my-lg-0 search-width" action="/search">
+                    <input type="text" name="q" class="form-control mr-sm-1" autocomplete="off"
+                           placeholder="游记、照片、用户" required style="width: 460px">
+                    <button class="btn btn-light my-2 my-sm-0" type="submit">
+                        <span class="oi oi-magnifying-glass"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
         <!-- 左右切换按钮 -->
         <a class="carousel-control-prev" href="#demo" data-slide="prev">
             <span class="carousel-control-prev-icon"></span>

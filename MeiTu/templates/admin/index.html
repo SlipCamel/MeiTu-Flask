@@ -68,7 +68,7 @@
                 <div class="card-body">
                     <h4 class="card-title">Total: {{ travel_count|default('0') }}</h4>
                     <p class="card-text">&nbsp;</p>
-                    <a class="btn btn-primary text-white" href="#">管理</a>
+                    <a class="btn btn-primary text-white" href="{{ url_for('admin.manage_travel') }}">管理</a>
                 </div>
             </div>
         </div>
@@ -78,8 +78,8 @@
                 <div class="card-body">
                     <h4 class="card-title">Total: {{ user_count|default('0') }}</h4>
                     <p class="card-text">&nbsp;</p>
-                    <a class="btn btn-primary text-white" href="#">管理</a>
-                    <a class="btn btn-primary text-white" href="#">添加管理员</a>
+                    <a class="btn btn-primary text-white" href="{{ url_for('admin.manage_user') }}">管理</a>
+{#                    <a class="btn btn-primary text-white" href="#">添加管理员</a>#}
                 </div>
             </div>
         </div>

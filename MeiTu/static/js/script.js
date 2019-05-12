@@ -153,6 +153,49 @@ $(function () {
         $('#tag-form').hide();
         $('#tags').show();
     });
+    $('#getCode').unbind('click').click(function (event) {
+        event.preventDefault();
+        time(this);
+        SendEmailCode()
+    });
+
+
+    var wait = 60;
+
+    function time(o) {
+        if (wait == 0) {
+            o.removeAttribute("disabled");
+            o.innerHTML = "发送验证码";
+            wait = 60;
+        } else {
+            o.setAttribute("disabled", true);
+            o.innerHTML = "重新发送(" + wait + ")";
+            wait--;
+            setTimeout(function () {
+                time(o)
+            }, 1000)
+        }
+    }
+
+    function SendEmailCode() {
+        $.ajax({
+            type: 'GET',
+            url: '/user/send_verify',
+            dataType: 'json',
+            success: function (data) {
+                if (data.data == 60) {
+                    toast('发送频率过快，请稍后重试', 'error')
+                } else {
+                    toast(data.data)
+                }
+            },
+            error: function () {
+                toast('服务器出错，请重试', 'error')
+            }
+        })
+    }
+
+
 });
 
 
@@ -165,48 +208,5 @@ $(document).ready(function () {
         titleAsText: true
     });
 });
-
-
-$('#getCode').unbind('click').click(function (event) {
-    event.preventDefault();
-    time(this);
-    SendEmailCode()
-});
-
-
-var wait = 60;
-
-function time(o) {
-    if (wait == 0) {
-        o.removeAttribute("disabled");
-        o.innerHTML = "发送验证码";
-        wait = 60;
-    } else {
-        o.setAttribute("disabled", true);
-        o.innerHTML = "重新发送(" + wait + ")";
-        wait--;
-        setTimeout(function () {
-            time(o)
-        }, 1000)
-    }
-}
-
-function SendEmailCode() {
-    $.ajax({
-        type: 'GET',
-        url: '/user/send_verify',
-        dataType: 'json',
-        success: function (data) {
-            if (data.data == 60) {
-                toast('发送频率过快，请稍后重试', 'error')
-            } else {
-                toast(data.data)
-            }
-        },
-        error: function () {
-            toast('服务器出错，请重试', 'error')
-        }
-    })
-}
 
 
