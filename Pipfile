@@ -21,6 +21,7 @@ flask-caching = "*"
 redis = "*"
 flask-moment = "*"
 flask-dropzone = "*"
+flask-whooshee = "*"
 
 [requires]
 python_version = "3.7"

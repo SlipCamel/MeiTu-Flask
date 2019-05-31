@@ -213,3 +213,5 @@ uploads/pic/*
 *.png
 *.jpg
 *.gif
+whooshee/
+/mysql-index

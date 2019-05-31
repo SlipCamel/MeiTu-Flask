@@ -61,13 +61,16 @@ class BaseConfig(object):
     CKEDITOR_FILE_BROWSER = '/user/show_upload'
     FILE_UPLOAD = os.path.join(MEITU_UPLOAD_PATH, 'pic')
 
+    WHOOSHEE_MIN_STRING_LEN = 1
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = prefix + os.path.join(basedir, 'data-dev.db')
 
 
 class ProductionConfig(BaseConfig):
-    pass
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', prefix + os.path.join(basedir, 'data-dev.db'))
+    WHOOSHEE_DIR = os.path.join(basedir, 'mysql-index')
 
 
 config = {

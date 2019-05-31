@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import Blueprint, render_template, current_app, send_from_directory, request
+from flask import Blueprint, render_template, current_app, send_from_directory, request, flash
 from sqlalchemy import func
 
 from MeiTu.form.user import CommentForm, TagForm
 from MeiTu.models import Travels, Comment, Collect, User, Tag
+from MeiTu.utils import redirect_back
 
 main_bp = Blueprint('main', __name__)
 
@@ -99,3 +100,27 @@ def show_tag(tag_id, order):
 @main_bp.route('/avatars/<path:filename>')
 def get_avatar(filename):
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename)
+
+
+@main_bp.route('/search')
+def search():
+    q = request.args.get('q', '')
+    if q == '':
+        flash('请输入查询信息', 'warning')
+        return redirect_back()
+
+    order_rule = request.args.get('order_rule', 'search_travels')
+    page = request.args.get('page', 1, type=int)
+    per_page = current_app.config['MEITU_TRAVELS_USER_PER_PAGE']
+    if order_rule == 'search_travels':
+        pagination = Travels.query.whooshee_search(q).paginate(page, per_page)
+        order_rule = 'search_travels'
+    elif order_rule == 'search_users':
+        pagination = User.query.whooshee_search(q).paginate(page, per_page)
+        order_rule = 'search_users'
+    else:
+        pagination = Tag.query.whooshee_search(q).paginate(page, per_page)
+        order_rule = 'search_tags'
+    results = pagination.items
+
+    return render_template('main/search.html', results=results, pagination=pagination, order_rule=order_rule, q=q)

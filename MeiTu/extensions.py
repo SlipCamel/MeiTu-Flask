@@ -9,6 +9,7 @@ from flask_moment import Moment
 from flask_wtf import CSRFProtect
 from flask_dropzone import Dropzone
 from flask_ckeditor import CKEditor
+from flask_whooshee import Whooshee
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -20,6 +21,7 @@ moment = Moment()
 csrf = CSRFProtect()
 drop_zone = Dropzone()
 ckeditor = CKEditor()
+whooshee = Whooshee()
 
 
 @login_manage.user_loader

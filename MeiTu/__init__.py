@@ -5,7 +5,8 @@ import click
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFError
 from MeiTu.settings import config
-from MeiTu.extensions import bootstrap, db, login_manage, avatars, mail, cache, moment, csrf, drop_zone, ckeditor
+from MeiTu.extensions import bootstrap, db, login_manage, avatars, mail, cache, moment, csrf, drop_zone, ckeditor, \
+    whooshee
 from MeiTu.models import User
 
 
@@ -51,6 +52,7 @@ def register_extensions(app):
     csrf.init_app(app)
     drop_zone.init_app(app)
     ckeditor.init_app(app)
+    whooshee.init_app(app)
 
 
 def register_errors(app):

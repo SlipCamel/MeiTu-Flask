@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% from 'macros.html' import travel_card, user_card with context %}
+{% block title %}查询 - {% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>#搜索结果
+            <small class="text-muted">{{ results|length }} results</small>
+            <span class="dropdown">
+            <button class="btn btn-secondary btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                {% if order_rule == 'search_travels' %}
+                    搜游记
+                {% elif order_rule == 'search_users' %}
+                    搜用户
+                {% else %}
+                    搜标签
+                {% endif %}
+                <span class="oi oi-elevator"></span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% if order_rule == 'search_travels' %}
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_users', q=q) }}">
+                        搜用户
+                    </a>
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_tags', q=q) }}">
+                        搜标签
+                    </a>
+                {% elif order_rule == 'search_users' %}
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_travels', q=q) }}">
+                        搜游记
+                    </a>
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_tags', q=q) }}">
+                        搜标签
+                    </a>
+                {% else %}
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_travels', q=q) }}">
+                        搜游记
+                    </a>
+                    <a class="dropdown-item" href="{{ url_for('main.search', order_rule='search_users', q=q) }}">
+                        搜用户
+                    </a>
+                {% endif %}
+            </div>
+        </span>
+        </h1>
+    </div>
+    {% if results %}
+        <div class="row">
+            {% for item in results %}
+                {% if order_rule == 'search_travels' %}
+                    {{ travel_card(item) }}
+                {% elif order_rule == 'search_users' %}
+                    {{ user_card(item) }}
+                {% else %}
+                    <a class="badge badge-light"
+                       href="{{ url_for('main.show_tag', tag_id=item.id) }}">{{ item.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="page-footer">
+            {{ render_pagination(pagination, align='center') }}
+        </div>
+    {% else %}
+        <h5 class="tip">没有结果</h5>
+    {% endif %}
+{% endblock %}

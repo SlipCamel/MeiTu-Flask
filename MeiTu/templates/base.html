@@ -37,7 +37,7 @@
                            href="{{ url_for('user.index', username=current_user.username) }}">
                             个人主页 </a>
                     {% endif %}
-                    <form class="form-inline my-2 my-lg-0" action="/search">
+                    <form class="form-inline my-2 my-lg-0" action="{{ url_for('main.search') }}">
                         <input type="text" name="q" class="form-control mr-sm-1" autocomplete="off"
                                placeholder="游记、照片、用户" required>
                         <button class="btn btn-light my-2 my-sm-0" type="submit">

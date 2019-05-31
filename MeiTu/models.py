@@ -8,6 +8,7 @@ from flask_avatars import Identicon
 from MeiTu.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from MeiTu.extensions import whooshee
 
 association_table = db.Table('association_table',
                              db.Column('travel_id', db.Integer, db.ForeignKey('travels.id')),
@@ -24,6 +25,7 @@ class Follow(db.Model):
     followed = db.relationship('User', foreign_keys=[followed_id], back_populates='followers', lazy='joined')
 
 
+@whooshee.register_model('username', 'nick_name')
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(12), unique=True, index=True)
@@ -130,6 +132,7 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
 
+@whooshee.register_model('title')
 class Travels(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.String(30), unique=True)
@@ -180,6 +183,7 @@ class Collect(db.Model):
     collected = db.relationship('Travels', back_populates='collectors', lazy='joined')
 
 
+@whooshee.register_model('name')
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
