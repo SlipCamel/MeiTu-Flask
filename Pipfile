@@ -9,7 +9,7 @@ faker = "*"
 
 [packages]
 flask = "*"
-python-dotenv = "*"
+python-dotenv = "==0.10.3"
 flask-sqlalchemy = "*"
 flask-ckeditor = "*"
 flask-wtf = "*"

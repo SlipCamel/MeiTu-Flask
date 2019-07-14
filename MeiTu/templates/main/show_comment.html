@@ -62,13 +62,13 @@
                                         </a>
                                     {% endif %}
                                     {% if current_user != comment.author %}
-                                        <form class="inline" method="post"
-                                              action="#">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="dropdown-item">
-                                        <span class="oi oi-warning" aria-hidden="true"></span> 举报
-                                      </button>
-                                </form>
+<!--                                <form class="inline" method="post"-->
+<!--                                              action="#">-->
+<!--                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">-->
+<!--                                    <button type="submit" class="dropdown-item">-->
+<!--                                        <span class="oi oi-warning" aria-hidden="true"></span> 举报-->
+<!--                                    </button>-->
+<!--                                </form>-->
                                     {% endif %}
                                 </span>
                                 </span>
@@ -88,7 +88,7 @@
             <hr>
         {% endfor %}
         <div class="page-footer">
-            {{ render_pagination(pagination) }}
+            {{ render_pagination(pagination, fragment='#comments') }}
         </div>
     {% else %}
         <p class="tip">还未有评论.</p>
@@ -99,7 +99,7 @@
             {% if request.args.get('reply') %}
                 <div class="alert alert-dark">
                     Reply to {{ request.args.get('author') }}:
-                    <a class="float-right" href="{{ url_for('main.show_travels', travel_id=travel.id) }}">Cancel</a>
+                    <a class="float-right" href="{{ url_for('main.show_travels', travel_id=travel.id) + '#comments' }}">Cancel</a>
                 </div>
             {% endif %}
             <div class="comment-form-area">

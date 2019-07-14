@@ -148,13 +148,13 @@ def set_head(uid):
         f = request.files.get('file')
         path = current_app.config['DROPZONE_FILE_UPLOAD']
         filename = resize_rename_img(image=f, filename=f.filename, path=path, base_width=230)
-        filename_m = resize_rename_img(image=f, filename=f.filename, path=path, base_width=400)
+        # filename_m = resize_rename_img(image=f, filename=f.filename, path=path, base_width=400)
 
         if travel.travel_head:
             travel.travel_head.filename = filename
-            travel.travel_head.filename_m = filename_m
+            # travel.travel_head.filename_m = filename_m
         else:
-            travel_head = TravelHead(travels=travel, filename=filename, filename_m=filename_m)
+            travel_head = TravelHead(travels=travel, filename=filename)
             db.session.add(travel_head)
         try:
             db.session.commit()
@@ -341,7 +341,7 @@ def set_comment(travel_id):
         travel.can_comment = True
         flash('评论已开启.', 'info')
     db.session.commit()
-    return redirect(url_for('main.show_travels', travel_id=travel_id))
+    return redirect(url_for('main.show_travels', travel_id=travel_id)+ '#comments')
 
 
 @user_bp.route('/travel/<int:travel_id>/comment/new', methods=['POST'])
@@ -371,7 +371,7 @@ def new_comment(travel_id):
             print('SQL EXCEPTION:' + str(e))
 
     flash_errors(form)
-    return redirect(url_for('main.show_travels', travel_id=travel_id, page=page))
+    return redirect(url_for('main.show_travels', travel_id=travel_id, page=page)+ '#comments')
 
 
 @user_bp.route('/delete/comment/<int:comment_id>', methods=['POST'])
@@ -389,7 +389,7 @@ def delete_comment(comment_id):
         db.session.rollback()
         print('SQL EXCEPTION:' + str(e))
 
-    return redirect(url_for('main.show_travels', travel_id=comment.travel_id))
+    return redirect(url_for('main.show_travels', travel_id=comment.travel_id)+ '#comments')
 
 
 @user_bp.route('/reply/comment/<int:comment_id>')

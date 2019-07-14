@@ -57,7 +57,7 @@ class WriteTravelsForm(FlaskForm):
 
 class CommentForm(FlaskForm):
     body = TextAreaField('内容', validators=[DataRequired()])
-    submit = SubmitField()
+    submit = SubmitField('发表评论')
 
 
 class PrivacySettingForm(FlaskForm):

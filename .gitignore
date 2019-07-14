@@ -213,5 +213,9 @@ uploads/pic/*
 *.png
 *.jpg
 *.gif
+*.log
+*.conf
 whooshee/
 /mysql-index
+uwsgi.ini
+uwsgi.pid

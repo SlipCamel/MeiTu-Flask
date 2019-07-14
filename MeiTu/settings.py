@@ -69,8 +69,10 @@ class DevelopmentConfig(BaseConfig):
 
 
 class ProductionConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', prefix + os.path.join(basedir, 'data-dev.db'))
-    WHOOSHEE_DIR = os.path.join(basedir, 'mysql-index')
+    path = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = path or prefix + os.path.join(basedir, 'data-dev.db')
+    if path:
+        WHOOSHEE_DIR = os.path.join(basedir, 'mysql-index')
 
 
 config = {

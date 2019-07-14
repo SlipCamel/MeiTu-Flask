@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import re
 from datetime import datetime
 
 from flask import current_app
@@ -200,3 +201,74 @@ class Notification(db.Model):
     receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     receiver = db.relationship('User', back_populates='notifications')
+
+
+@db.event.listens_for(User, 'after_delete', named=True)
+def delete_avatars(**kwargs):
+    target = kwargs['target']
+    for filename in [target.avatar_s, target.avatar_m, target.avatar_l, target.avatar_raw]:
+        if filename is not None:
+            path = os.path.join(current_app.config['AVATARS_SAVE_PATH'], filename)
+            if os.path.exists(path):
+                os.remove(path)
+
+
+@db.event.listens_for(User.avatar_s, 'set', named=True)
+def delete_old_avatars(**kwargs):
+    avatar_s = kwargs['oldvalue']
+    img_name = os.path.splitext(avatar_s)[0]
+    extension = os.path.splitext(avatar_s)[1]
+    avatar_l = img_name[0:-2] + '_l' + extension
+    avatar_m = img_name[0:-2] + '_m' + extension
+    img_list = [avatar_s, avatar_l, avatar_m]
+    for filename in img_list:
+        path = os.path.join(current_app.config['AVATARS_SAVE_PATH'], filename)
+        if os.path.exists(path):
+            os.remove(path)
+
+
+@db.event.listens_for(User.avatar_raw, 'set', named=True)
+def delete_old_raw_avatars(**kwargs):
+    avatar_raw = kwargs['oldvalue']
+    path = os.path.join(current_app.config['AVATARS_SAVE_PATH'], avatar_raw)
+    if os.path.exists(path):
+        os.remove(path)
+
+
+@db.event.listens_for(Travels, 'after_delete', named=True)
+def delete_pic(**kwargs):
+    target = kwargs['target']
+    img_url_list = re.findall(r'src="(.*?)"', target.body)
+    if len(img_url_list):
+        distinct_list = list(set(img_url_list))
+        img_list = [i.split('/')[-1] for i in distinct_list]
+        for filename in img_list:
+            path = os.path.join(current_app.config['FILE_UPLOAD'], filename)
+            if os.path.exists(path):
+                os.remove(path)
+
+
+@db.event.listens_for(TravelHead, 'after_delete', named=True)
+def delete_head(**kwargs):
+    target = kwargs['target']
+    for filename in [target.filename, target.filename_m]:
+        if filename is not None:
+            path = os.path.join(current_app.config['DROPZONE_FILE_UPLOAD'], filename)
+            if os.path.exists(path):
+                os.remove(path)
+
+
+@db.event.listens_for(Travels.body, 'set', named=True)
+def delete_oldpic(**kwargs):
+    value = kwargs['value']
+    old_value = kwargs['oldvalue']
+    if type(old_value) is str:
+        img_url_list = re.findall(r'src="(.*?)"', value)
+        oldimg_url_list = re.findall(r'src="(.*?)"', old_value)
+        diff_url_list = list(set(oldimg_url_list) - set(img_url_list))
+        if len(diff_url_list):
+            img_list = [i.split('/')[-1] for i in diff_url_list]
+            for filename in img_list:
+                path = os.path.join(current_app.config['FILE_UPLOAD'], filename)
+                if os.path.exists(path):
+                    os.remove(path)
