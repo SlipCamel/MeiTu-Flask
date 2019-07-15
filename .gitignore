@@ -219,3 +219,4 @@ whooshee/
 /mysql-index
 uwsgi.ini
 uwsgi.pid
+data-dev.db
