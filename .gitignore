@@ -220,3 +220,7 @@ whooshee/
 uwsgi.ini
 uwsgi.pid
 data-dev.db
+ .htaccess
+ .user.ini
+ 404.html
+ index.html
