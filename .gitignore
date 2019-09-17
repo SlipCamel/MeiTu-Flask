@@ -224,3 +224,7 @@ data-dev.db
 .user.ini
 404.html
 index.html
+uwsgi.log
+uwsgi.ini
+.htaccess
+.user.ini
